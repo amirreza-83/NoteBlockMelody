@@ -1,0 +1,52 @@
+name: NoteBlockMelody
+version: '${project.version}'
+main: me.nbm.noteblockmelody.NoteBlockMelody
+prefix: &6NBM
+api-version: '1.13'
+load: STARTUP
+authors:
+  - Amirreza83
+  - Moftbar_Diamond
+  - XserGod
+  - mahshid_
+description: A Musical Notes Plugin
+website: www.minestar.top
+commands:
+  nbm:
+    description: Main NoteBlockMelody command
+    usage: /nbm reload
+  guitar:
+    description: Opens the guitar GUI
+    usage: /guitar
+  bass:
+    description: Opens the bass GUI
+    usage: /bass
+  bell:
+    description: Opens the bell GUI
+    usage: /bell
+  chime:
+    description: Opens the chime GUI
+    usage: /chime
+  flute:
+    description: Opens the flute GUI
+    usage: /flute
+  harp:
+    description: Opens the harp GUI
+    usage: /harp
+  hat:
+    description: Opens the hat GUI
+    usage: /hat
+  snare_drum:
+    description: Opens the snare_drum GUI
+    usage: /snare_drum
+  xylophone:
+    description: Opens the xylophone GUI
+    usage: /xylophone
+
+permissions:
+  nbm.use:
+    description: "Allows using all instrument GUIs and /nbm command"
+    default: op
+  nbm.admin:
+    description: "Allows admin access including /nbm reload command"
+    default: op
