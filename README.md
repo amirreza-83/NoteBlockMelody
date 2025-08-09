@@ -5,9 +5,10 @@ brings instruments to Minecraft! Grab your guitar, flute, or harp and play live 
 
 ## ✨ Features
 
-- jail system 
-- nice performance
-- customize massage
+- custom pitches
+- custom sound
+- Hybrid musical instrument
+- High performance
 
 ## 📥 Installation
 
