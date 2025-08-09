@@ -11,7 +11,7 @@ brings instruments to Minecraft! Grab your guitar, flute, or harp and play live 
 
 ## 📥 Installation
 
-1. Download the latest `.jar` from [Releases](https://github.com/amirreza-83/msWanted/releases/tag/beta) or [spigot](https://www.spigotmc.org/resources/mswanted-1-13-1-21-8-wanted-bounty-system.127810/)
+1. Download the latest `.jar` from [Releases](https://github.com/amirreza-83/NoteBlockMelody/releases/tag/Alpha) or [spigot](https://www.spigotmc.org/resources/noteblockmelody-1-12-2-1-21-8-guitar-instrument-plugin.127827/)
 2. Put it in your server's `plugins` folder
 3. Restart or reload the server
 4. Enjoy riding!
