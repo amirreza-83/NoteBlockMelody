@@ -48,30 +48,46 @@ public class NBMCommand implements CommandExecutor {
         if (player.hasPermission("nbm.admin")) {
             player.sendMessage(ChatColor.YELLOW + "/nbm reload " + ChatColor.WHITE + "- Reload all instrument configs (Admin)");
         }
-        player.sendMessage(ChatColor.YELLOW + "/guitar " + ChatColor.WHITE + "- Open guitar GUI");
+        player.sendMessage(ChatColor.YELLOW + "/banjo " + ChatColor.WHITE + "- Open banjo GUI");
+        player.sendMessage(ChatColor.YELLOW + "/base_drum " + ChatColor.WHITE + "- Open base drum GUI");
         player.sendMessage(ChatColor.YELLOW + "/bass " + ChatColor.WHITE + "- Open bass GUI");
         player.sendMessage(ChatColor.YELLOW + "/bell " + ChatColor.WHITE + "- Open bell GUI");
+        player.sendMessage(ChatColor.YELLOW + "/bit " + ChatColor.WHITE + "- Open bit GUI");
         player.sendMessage(ChatColor.YELLOW + "/chime " + ChatColor.WHITE + "- Open chime GUI");
+        player.sendMessage(ChatColor.YELLOW + "/cow_bell " + ChatColor.WHITE + "- Open cow bell GUI");
+        player.sendMessage(ChatColor.YELLOW + "/didgeridoo " + ChatColor.WHITE + "- Open didgeridoo GUI");
         player.sendMessage(ChatColor.YELLOW + "/flute " + ChatColor.WHITE + "- Open flute GUI");
+        player.sendMessage(ChatColor.YELLOW + "/guitar " + ChatColor.WHITE + "- Open guitar GUI");
         player.sendMessage(ChatColor.YELLOW + "/harp " + ChatColor.WHITE + "- Open harp GUI");
         player.sendMessage(ChatColor.YELLOW + "/hat " + ChatColor.WHITE + "- Open hat GUI");
+        player.sendMessage(ChatColor.YELLOW + "/iron_xylophone " + ChatColor.WHITE + "- Open iron xylophone GUI");
+        player.sendMessage(ChatColor.YELLOW + "/pling " + ChatColor.WHITE + "- Open pling GUI");
         player.sendMessage(ChatColor.YELLOW + "/snare_drum " + ChatColor.WHITE + "- Open snare drum GUI");
         player.sendMessage(ChatColor.YELLOW + "/xylophone " + ChatColor.WHITE + "- Open xylophone GUI");
+        player.sendMessage(ChatColor.YELLOW + "/extra " + ChatColor.WHITE + "- Open extra GUI");
 
         return true;
     }
 
     private void reloadAllConfigs(Player player) {
         Map<String, String> configFiles = new HashMap<>();
-        configFiles.put("Guitar", "Guitar.yml");
+        configFiles.put("Banjo", "Banjo.yml");
+        configFiles.put("BaseDrum", "BaseDrum.yml");
         configFiles.put("Bass", "Bass.yml");
         configFiles.put("Bell", "Bell.yml");
+        configFiles.put("Bit", "Bit.yml");
         configFiles.put("Chime", "Chime.yml");
+        configFiles.put("CowBell", "CowBell.yml");
+        configFiles.put("Didgeridoo", "Didgeridoo.yml");
         configFiles.put("Flute", "Flute.yml");
+        configFiles.put("Guitar", "Guitar.yml");
         configFiles.put("Harp", "Harp.yml");
         configFiles.put("Hat", "Hat.yml");
+        configFiles.put("IronXylophone", "IronXylophone.yml");
+        configFiles.put("Pling", "Pling.yml");
         configFiles.put("SnareDrum", "SnareDrum.yml");
         configFiles.put("Xylophone", "Xylophone.yml");
+        configFiles.put("Extra", "Extra.yml");
 
         int successCount = 0;
         int failCount = 0;
@@ -113,15 +129,23 @@ public class NBMCommand implements CommandExecutor {
         // Reload instrument items after config reload
         if (successCount > 0) {
             try {
-                plugin.guitarvalue();
+                plugin.banjovalue();
+                plugin.baseDrumvalue();
                 plugin.bassvalue();
                 plugin.bellvalue();
+                plugin.bitvalue();
                 plugin.chimevalue();
+                plugin.cowBellvalue();
+                plugin.didgeridoovalue();
                 plugin.flutevalue();
+                plugin.guitarvalue();
                 plugin.harpvalue();
                 plugin.hatvalue();
+                plugin.ironXylophonevalue();
+                plugin.plingvalue();
                 plugin.snareDrumvalue();
                 plugin.xylophonevalue();
+                plugin.extravalue();
                 player.sendMessage(ChatColor.GREEN + "Instrument items have been updated!");
             } catch (Exception e) {
                 player.sendMessage(ChatColor.RED + "Failed to update instrument items: " + e.getMessage());

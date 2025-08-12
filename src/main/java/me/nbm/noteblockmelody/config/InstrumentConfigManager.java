@@ -11,8 +11,10 @@ import java.util.Map;
 public class InstrumentConfigManager {
 
     private static final String[] instrumentFiles = {
-            "Harp", "Bass", "SnareDrum", "Hat", "Flute",
-            "Bell", "Guitar", "Chime", "Xylophone"
+            "Banjo", "BaseDrum", "Bass", "Bell", "Bit", 
+            "Chime", "CowBell", "Didgeridoo", "Flute", 
+            "Guitar", "Harp", "Hat", "IronXylophone",
+            "Pling", "SnareDrum", "Xylophone", "Extra"   
     };
 
     private static final Map<String, FileConfiguration> configs = new HashMap<>();

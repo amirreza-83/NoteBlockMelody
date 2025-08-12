@@ -2,12 +2,22 @@ package me.nbm.noteblockmelody;
 
 import me.nbm.noteblockmelody.config.InstrumentConfigManager;
 import me.nbm.noteblockmelody.NBMCommand;
+import me.nbm.noteblockmelody.notes.banjo.banjo_command;
+import me.nbm.noteblockmelody.notes.banjo.banjo_event;
+import me.nbm.noteblockmelody.notes.base_drum.base_drum_command;
+import me.nbm.noteblockmelody.notes.base_drum.base_drum_event;
 import me.nbm.noteblockmelody.notes.bass.bass_command;
 import me.nbm.noteblockmelody.notes.bass.bass_event;
 import me.nbm.noteblockmelody.notes.bell.bell_command;
 import me.nbm.noteblockmelody.notes.bell.bell_event;
+import me.nbm.noteblockmelody.notes.bit.bit_command;
+import me.nbm.noteblockmelody.notes.bit.bit_event;
 import me.nbm.noteblockmelody.notes.chime.chime_command;
 import me.nbm.noteblockmelody.notes.chime.chime_event;
+import me.nbm.noteblockmelody.notes.cow_bell.cow_bell_command;
+import me.nbm.noteblockmelody.notes.cow_bell.cow_bell_event;
+import me.nbm.noteblockmelody.notes.didgeridoo.didgeridoo_command;
+import me.nbm.noteblockmelody.notes.didgeridoo.didgeridoo_event;
 import me.nbm.noteblockmelody.notes.flute.flute_command;
 import me.nbm.noteblockmelody.notes.flute.flute_event;
 import me.nbm.noteblockmelody.notes.guitar.guitar_command;
@@ -16,10 +26,16 @@ import me.nbm.noteblockmelody.notes.harp.harp_command;
 import me.nbm.noteblockmelody.notes.harp.harp_event;
 import me.nbm.noteblockmelody.notes.hat.hat_command;
 import me.nbm.noteblockmelody.notes.hat.hat_event;
+import me.nbm.noteblockmelody.notes.iron_xylophone.iron_xylophone_command;
+import me.nbm.noteblockmelody.notes.iron_xylophone.iron_xylophone_event;
+import me.nbm.noteblockmelody.notes.pling.pling_command;
+import me.nbm.noteblockmelody.notes.pling.pling_event;
 import me.nbm.noteblockmelody.notes.snare_drum.snare_drum_command;
 import me.nbm.noteblockmelody.notes.snare_drum.snare_drum_event;
 import me.nbm.noteblockmelody.notes.xylophone.xylophone_command;
 import me.nbm.noteblockmelody.notes.xylophone.xylophone_event;
+import me.nbm.noteblockmelody.notes.extra.extra_command;
+import me.nbm.noteblockmelody.notes.extra.extra_event;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -27,6 +43,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.NamespacedKey;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.ChatColor;
 
@@ -39,38 +56,52 @@ public class NoteBlockMelody extends JavaPlugin {
 
     public FileConfiguration config;
     public FileConfiguration guitarConfig;
-    public ItemStack snareDrumItem;
-    public ItemStack xylophoneItem;
 
     public Map<String, FileConfiguration> instrumentConfigs = new HashMap<>();
 
-    public ItemStack guitarItem;
     public String guiTitle;
     public List<String> stringItems;
     public List<Double> pitches;
     public List<String> sounds;
     public List<Integer> stringItemPositions;
     public List<String> stringNames;
+    public ItemStack extraItem;
+    public ItemStack snareDrumItem;
+    public ItemStack xylophoneItem;
+    public ItemStack plingItem;
+    public ItemStack ironXylophoneItem;
     public ItemStack hatItem;
     public ItemStack harpItem;
+    public ItemStack guitarItem;
     public ItemStack fluteItem;
+    public ItemStack didgeridooItem;
+    public ItemStack cowBellItem;
     public ItemStack chimeItem;
+    public ItemStack bitItem;
     public ItemStack bellItem;
     public ItemStack bassItem;
+    public ItemStack baseDrumItem;
+    public ItemStack banjoItem;
+
+    public ConsoleCommandSender message;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
         config = getConfig();
-        
+        message = Bukkit.getConsoleSender();
         saveDefaultInstrumentConfigs();
         InstrumentConfigManager.init(this);
         
         detectServerVersionAndUpdateConfigs();
 
         getCommand("nbm").setExecutor(new NBMCommand(this));
-        getCommand("guitar").setExecutor(new guitar_command(this));
-        Bukkit.getPluginManager().registerEvents(new guitar_event(this), this);
+
+        getCommand("banjo").setExecutor(new banjo_command(this));
+        Bukkit.getPluginManager().registerEvents(new banjo_event(this), this);
+
+        getCommand("base_drum").setExecutor(new base_drum_command(this));
+        Bukkit.getPluginManager().registerEvents(new base_drum_event(this), this);
 
         getCommand("bass").setExecutor(new bass_command(this));
         Bukkit.getPluginManager().registerEvents(new bass_event(this), this);
@@ -78,77 +109,117 @@ public class NoteBlockMelody extends JavaPlugin {
         getCommand("bell").setExecutor(new bell_command(this));
         Bukkit.getPluginManager().registerEvents(new bell_event(this), this);
 
+        getCommand("bit").setExecutor(new bit_command(this));
+        Bukkit.getPluginManager().registerEvents(new bit_event(this), this);
+
         getCommand("chime").setExecutor(new chime_command(this));
         Bukkit.getPluginManager().registerEvents(new chime_event(this), this);
+
+        getCommand("cow_bell").setExecutor(new cow_bell_command(this));
+        Bukkit.getPluginManager().registerEvents(new cow_bell_event(this), this);
+
+        getCommand("didgeridoo").setExecutor(new didgeridoo_command(this));
+        Bukkit.getPluginManager().registerEvents(new didgeridoo_event(this), this);
 
         getCommand("flute").setExecutor(new flute_command(this));
         Bukkit.getPluginManager().registerEvents(new flute_event(this), this);
 
-        getCommand("hat").setExecutor(new hat_command(this));
-        Bukkit.getPluginManager().registerEvents(new hat_event(this), this);
-
-        getCommand("snare_drum").setExecutor(new snare_drum_command(this));
-        Bukkit.getPluginManager().registerEvents(new snare_drum_event(this), this);
+        getCommand("guitar").setExecutor(new guitar_command(this));
+        Bukkit.getPluginManager().registerEvents(new guitar_event(this), this);
 
         getCommand("harp").setExecutor(new harp_command(this));
         Bukkit.getPluginManager().registerEvents(new harp_event(this), this);
 
+        getCommand("hat").setExecutor(new hat_command(this));
+        Bukkit.getPluginManager().registerEvents(new hat_event(this), this);
+
+        getCommand("iron_xylophone").setExecutor(new iron_xylophone_command(this));
+        Bukkit.getPluginManager().registerEvents(new iron_xylophone_event(this), this);
+
+        getCommand("pling").setExecutor(new pling_command(this));
+        Bukkit.getPluginManager().registerEvents(new pling_event(this), this);
+
+        getCommand("snare_drum").setExecutor(new snare_drum_command(this));
+        Bukkit.getPluginManager().registerEvents(new snare_drum_event(this), this);
+
         getCommand("xylophone").setExecutor(new xylophone_command(this));
         Bukkit.getPluginManager().registerEvents(new xylophone_event(this), this);
 
-        getLogger().info("§6===============================================");
-        getLogger().info("§6                                               ");
-        getLogger().info("§6    §eNoteBlockMelody v1.7-α                   ");
-        getLogger().info("§6                                               ");
-        getLogger().info("§6           §bMade by Minestar                  ");
-        getLogger().info("§6                                               ");
-        getLogger().info("§6===============================================");
-        getLogger().info("§6 §aGuitar  §bBass    §cBell   §dChime           ");
-        getLogger().info("§6 §eFlute   §fHarp    §9Hat    §2Snare           ");
-        getLogger().info("§6 §3Xylophone                                   ");
-        getLogger().info("§6===============================================");
-        getLogger().info("§6        §2All instruments loaded!              ");
-        getLogger().info("§6===============================================");
+        getCommand("extra").setExecutor(new extra_command(this));
+        Bukkit.getPluginManager().registerEvents(new extra_event(this), this);
 
+        message.sendMessage("§6===============================================");
+        message.sendMessage("§6                                               ");
+        message.sendMessage("§6    §eNoteBlockMelody v1.7-α                   ");
+        message.sendMessage("§6                                               ");
+        message.sendMessage("§6           §bMade by Minestar                  ");
+        message.sendMessage("§6                                               ");
+        message.sendMessage("§6===============================================");
+        message.sendMessage("§6 §aBanjo  §bBaseDrum   §cBass    §dBell    §eBit");
+        message.sendMessage("§6 §fChime  §1CowBell    §2Didgeridoo §3Flute");
+        message.sendMessage("§6 §4Guitar §5Harp       §6Hat     §7IronXylophone");
+        message.sendMessage("§6 §8Pling  §9SnareDrum  §aXylophone  §bExtra");
+        message.sendMessage("§6===============================================");
+        message.sendMessage("§6        §2All instruments loaded!              ");
+        message.sendMessage("§6===============================================");
+
+        extravalue();
         xylophonevalue();
         snareDrumvalue();
+        plingvalue();
+        ironXylophonevalue();
         hatvalue();
         harpvalue();
+        guitarvalue();
         flutevalue();
+        didgeridoovalue();
+        cowBellvalue();
         chimevalue();
+        bitvalue();
         bellvalue();
         bassvalue();
-        guitarvalue();
+        baseDrumvalue();
+        banjovalue();
 
-        createGuitarRecipe();
-        createXylophoneRecipe();
-        createSnareDrumRecipe();
-        createHatRecipe();
-        createHarpRecipe();
-        createFluteRecipe();
-        createChimeRecipe();
-        createBellRecipe();
-        createBassRecipe();
+        if(config.getBoolean("craftable")) {
+          createExtraRecipe();
+          createXylophoneRecipe();
+          createSnareDrumRecipe();
+          createPlingRecipe();
+          createIronXylophoneRecipe();
+          createHatRecipe();
+          createHarpRecipe();
+          createGuitarRecipe();
+          createFluteRecipe();
+          createDidgeridooRecipe();
+          createCowBellRecipe();
+          createChimeRecipe();
+          createBitRecipe();
+          createBellRecipe();
+          createBassRecipe();
+          createBaseDrumRecipe();
+          createBanjoRecipe();
+        }
 
-        getLogger().info("§d===============================================");
-        getLogger().info("§d                                               ");
-        getLogger().info("§d        §aNoteBlockMelody is Ready!             ");
-        getLogger().info("§d                                               ");
-        getLogger().info("§d    §6Let's make some beautiful music!         ");
-        getLogger().info("§d                                               ");
-        getLogger().info("§d===============================================");
+        message.sendMessage("§d===============================================");
+        message.sendMessage("§d                                               ");
+        message.sendMessage("§d        §aNoteBlockMelody is Ready!             ");
+        message.sendMessage("§d                                               ");
+        message.sendMessage("§d    §6Let's make some beautiful music!         ");
+        message.sendMessage("§d                                               ");
+        message.sendMessage("§d===============================================");
     }
 
     @Override
     public void onDisable() {
         removeAllRecipes();
-        getLogger().info("§c===============================================");
-        getLogger().info("§c                                               ");
-        getLogger().info("§c      §4NoteBlockMelody Disabled                ");
-        getLogger().info("§c                                               ");
-        getLogger().info("§c        §6Thanks for using our plugin!         ");
-        getLogger().info("§c                                               ");
-        getLogger().info("§c===============================================");
+        message.sendMessage("§c===============================================");
+        message.sendMessage("§c                                               ");
+        message.sendMessage("§c      §4NoteBlockMelody Disabled                ");
+        message.sendMessage("§c                                               ");
+        message.sendMessage("§c        §6Thanks for using our plugin!         ");
+        message.sendMessage("§c                                               ");
+        message.sendMessage("§c===============================================");
     }
     
     private void removeAllRecipes() {
@@ -158,16 +229,24 @@ public class NoteBlockMelody extends JavaPlugin {
                 org.bukkit.inventory.Recipe recipe = iterator.next();
                 if (recipe instanceof org.bukkit.inventory.ShapedRecipe) {
                     org.bukkit.inventory.ShapedRecipe shapedRecipe = (org.bukkit.inventory.ShapedRecipe) recipe;
-                    if (shapedRecipe.getResult().isSimilar(guitarItem) ||
-                        shapedRecipe.getResult().isSimilar(bassItem) ||
-                        shapedRecipe.getResult().isSimilar(bellItem) ||
-                        shapedRecipe.getResult().isSimilar(chimeItem) ||
-                        shapedRecipe.getResult().isSimilar(fluteItem) ||
-                        shapedRecipe.getResult().isSimilar(harpItem) ||
-                        shapedRecipe.getResult().isSimilar(hatItem) ||
-                        shapedRecipe.getResult().isSimilar(snareDrumItem) ||
-                        shapedRecipe.getResult().isSimilar(xylophoneItem)) {
-                        iterator.remove();
+                    if(config.getBoolean("craftable")) {
+                        if (shapedRecipe.getResult().isSimilar(guitarItem) ||
+                            shapedRecipe.getResult().isSimilar(baseDrumItem) ||
+                            shapedRecipe.getResult().isSimilar(bassItem) ||
+                            shapedRecipe.getResult().isSimilar(bellItem) ||
+                            shapedRecipe.getResult().isSimilar(chimeItem) ||
+                            shapedRecipe.getResult().isSimilar(cowBellItem) ||
+                            shapedRecipe.getResult().isSimilar(didgeridooItem) ||
+                            shapedRecipe.getResult().isSimilar(fluteItem) ||
+                            shapedRecipe.getResult().isSimilar(harpItem) ||
+                            shapedRecipe.getResult().isSimilar(hatItem) ||
+                            shapedRecipe.getResult().isSimilar(ironXylophoneItem) ||
+                            shapedRecipe.getResult().isSimilar(plingItem) ||
+                            shapedRecipe.getResult().isSimilar(snareDrumItem) ||
+                            shapedRecipe.getResult().isSimilar(xylophoneItem) ||
+                            shapedRecipe.getResult().isSimilar(extraItem) ) {
+                            iterator.remove();
+                        }
                     }
                 }
             }
@@ -176,17 +255,21 @@ public class NoteBlockMelody extends JavaPlugin {
     }
     
     private void saveDefaultInstrumentConfigs() {
-        String[] configFiles = {"Guitar.yml", "Bass.yml", "Bell.yml", "Chime.yml", "Flute.yml", 
-                               "Harp.yml", "Hat.yml", "SnareDrum.yml", "Xylophone.yml"};
+        String[] configFiles = {"Banjo.yml", "BaseDrum.yml", "Bass.yml", "Bell.yml",
+                               "Bit.yml", "Chime.yml", "CowBell.yml", "Didgeridoo.yml",
+                               "Flute.yml", "Guitar.yml", "Harp.yml", "Hat.yml",
+                               "IronXylophone.yml", "Pling.yml", "SnareDrum.yml",
+                               "Xylophone.yml", "Extra.yml"
+                               };
         
         String version = extractVersionNumber(Bukkit.getBukkitVersion());
         boolean useModernConfigs = !isVersion1_12_or_below(version);
         
-        getLogger().info("§b==============================================");
+        message.sendMessage("§b===============================================");
         if (useModernConfigs) {
-            getLogger().info("§a Loading Modern Configs (1.13+)");
-            getLogger().info("§6 Source: new/ folder");
-            getLogger().info("§b----------------------------------------------");
+            message.sendMessage("§a Loading Modern Configs (1.13+)");
+            message.sendMessage("§6 Source: new/ folder");
+            message.sendMessage("§b----------------------------------------------");
             int loadedCount = 0;
             for (String configFile : configFiles) {
                 File targetFile = new File(getDataFolder(), configFile);
@@ -199,9 +282,9 @@ public class NoteBlockMelody extends JavaPlugin {
                             sourceFile.delete();
                             loadedCount++;
                             String fileName = configFile.replace(".yml", "");
-                            getLogger().info("§a ✓ " + fileName);
+                            message.sendMessage("§a ✓ " + fileName);
                         } catch (Exception e) {
-                            getLogger().info("§c ✗ " + configFile);
+                            message.sendMessage("§c ✗ " + configFile);
                         }
                     }
                 }
@@ -210,51 +293,51 @@ public class NoteBlockMelody extends JavaPlugin {
             if (newFolder.exists() && newFolder.isDirectory()) {
                 newFolder.delete();
             }
-            getLogger().info("§b----------------------------------------------");
-            getLogger().info("§2 Loaded " + loadedCount + " modern configs successfully!");
+            message.sendMessage("§b-----------------------------------------------");
+            message.sendMessage("§2 Loaded " + loadedCount + " modern configs successfully!");
         } else {
-            getLogger().info("§a Loading Legacy Configs (1.12-)");
-            getLogger().info("§6 Source: default resources");
-            getLogger().info("§b----------------------------------------------");
+            message.sendMessage("§a Loading Legacy Configs (1.12-)");
+            message.sendMessage("§6 Source: default resources");
+            message.sendMessage("§b-----------------------------------------------");
             int loadedCount = 0;
             for (String configFile : configFiles) {
                 if (!new File(getDataFolder(), configFile).exists()) {
                     saveResource(configFile, false);
                     loadedCount++;
                     String fileName = configFile.replace(".yml", "");
-                    getLogger().info("§a ✓ " + fileName);
+                    message.sendMessage("§a ✓ " + fileName);
                 }
             }
-            getLogger().info("§b----------------------------------------------");
-            getLogger().info("§2 Loaded " + loadedCount + " legacy configs successfully!");
+            message.sendMessage("§b----------------------------------------------");
+            message.sendMessage("§2 Loaded " + loadedCount + " legacy configs successfully!");
         }
-        getLogger().info("§b==============================================");
+        message.sendMessage("§b===============================================");
     }
 
     private void detectServerVersionAndUpdateConfigs() {
         String version = Bukkit.getVersion();
         String bukkitVersion = Bukkit.getBukkitVersion();
         
-        getLogger().info("§e╔══════════════════════════════════════════════╗");
-        getLogger().info("§e║          §6NoteBlockMelody v1.7-α             §e║");
-        getLogger().info("§e║              §bVersion Detection              §e║");
-        getLogger().info("§e╠══════════════════════════════════════════════╣");
-        getLogger().info("§e║ §aServer: §f" + String.format("%-32s", version) + " §e║");
-        getLogger().info("§e║ §aBukkit: §f" + String.format("%-32s", bukkitVersion) + " §e║");
+        message.sendMessage("§e╔═════════════════════════════════════════════╗");
+        message.sendMessage("§e          §6NoteBlockMelody v1.7-α             ");
+        message.sendMessage("§e              §bVersion Detection              ");
+        message.sendMessage("§e╠═════════════════════════════════════════════╣");
+        message.sendMessage("§e §aServer: §f" + String.format("%-32s", version));
+        message.sendMessage("§e §aBukkit: §f" + String.format("%-32s", bukkitVersion));
         
         String versionNumber = extractVersionNumber(bukkitVersion);
-        getLogger().info("§e║ §aVersion: §f" + String.format("%-31s", versionNumber) + " §e║");
-        getLogger().info("§e╠══════════════════════════════════════════════╣");
+        message.sendMessage("§e §aVersion: §f" + String.format("%-31s", versionNumber));
+        message.sendMessage("§e╠═════════════════════════════════════════════╣");
         
         if (isVersion1_12_or_below(versionNumber)) {
-            getLogger().info("§e║ §bStatus: §6Legacy Mode §7(1.12 & below)       §e║");
-            getLogger().info("§e║ §dSounds: §fClassic Note Block Sounds        §e║");
+            message.sendMessage("§e §bStatus: §6Legacy Mode §7(1.12 & below)");
+            message.sendMessage("§e §dSounds: §fClassic Note Block Sounds");
         } else {
-            getLogger().info("§e║ §bStatus: §6Modern Mode §7(1.13+)             §e║");
-            getLogger().info("§e║ §dSounds: §fAdvanced Note Block Sounds       §e║");
+            message.sendMessage("§e §bStatus: §6Modern Mode §7(1.13+)");
+            message.sendMessage("§e §dSounds: §fAdvanced Note Block Sounds");
         }
-        getLogger().info("§e║ §2Status: §aReady to Rock!                   §e║");
-        getLogger().info("§e╚══════════════════════════════════════════════╝");
+        message.sendMessage("§e §2Status: §aReady to Rock!");
+        message.sendMessage("§e╚═════════════════════════════════════════════╝");
     }
     
     private String extractVersionNumber(String bukkitVersion) {
@@ -273,17 +356,31 @@ public class NoteBlockMelody extends JavaPlugin {
                version.startsWith("1.8") || version.startsWith("1.7");
     }
 
-    public void guitarvalue() {
-        guitarItem = new ItemStack(Material.STICK);
-        ItemMeta meta = guitarItem.getItemMeta();
+    public void banjovalue() {
+        banjoItem = new ItemStack(Material.STICK);
+        ItemMeta meta = banjoItem.getItemMeta();
         if (meta != null) {
-            FileConfiguration guitarConfig = InstrumentConfigManager.get("Guitar");
-            String guitarName = "&6Epic Guitar";
-            if (guitarConfig != null) {
-                guitarName = guitarConfig.getString("guitar-name", guitarName);
+            FileConfiguration banjoConfig = InstrumentConfigManager.get("Banjo");
+            String banjoName = "&6Epic Banjo";
+            if (banjoConfig != null) {
+                banjoName = banjoConfig.getString("banjo-name", banjoName);
             }
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', guitarName));
-            guitarItem.setItemMeta(meta);
+            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', banjoName));
+            banjoItem.setItemMeta(meta);
+        }
+    }
+
+    public void baseDrumvalue() {
+        baseDrumItem = new ItemStack(Material.STICK);
+        ItemMeta meta = baseDrumItem.getItemMeta();
+        if (meta != null) {
+            FileConfiguration BaseDrumConfig = InstrumentConfigManager.get("BaseDrum");
+            String BaseDrumName = "&6Epic Base Drum";
+            if (BaseDrumConfig != null) {
+                BaseDrumName = BaseDrumConfig.getString("base_drum-name", BaseDrumName);
+            }
+            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', BaseDrumName));
+            baseDrumItem.setItemMeta(meta);
         }
     }
 
@@ -314,7 +411,19 @@ public class NoteBlockMelody extends JavaPlugin {
             bellItem.setItemMeta(meta);
         }
     }
-
+    public void bitvalue() {
+        bitItem = new ItemStack(Material.STICK);
+        ItemMeta meta = bitItem.getItemMeta();
+        if (meta != null) {
+            FileConfiguration bitConfig = InstrumentConfigManager.get("Bit");
+            String bitName = "&6Epic Bit";
+            if (bitConfig != null) {
+                bitName = bitConfig.getString("bit-name", bitName);
+            }
+            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', bitName));
+            bitItem.setItemMeta(meta);
+        }
+    }
     public void chimevalue() {
         chimeItem = new ItemStack(Material.STICK);
         ItemMeta meta = chimeItem.getItemMeta();
@@ -329,6 +438,34 @@ public class NoteBlockMelody extends JavaPlugin {
         }
     }
 
+        public void cowBellvalue() {
+        cowBellItem = new ItemStack(Material.STICK);
+        ItemMeta meta = cowBellItem.getItemMeta();
+        if (meta != null) {
+            FileConfiguration CowBellConfig = InstrumentConfigManager.get("CowBell");
+            String CowBellName = "&6Epic Cow Bell";
+            if (CowBellConfig != null) {
+                CowBellName = CowBellConfig.getString("cow_bell-name", CowBellName);
+            }
+            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', CowBellName));
+            cowBellItem.setItemMeta(meta);
+        }
+    }
+
+    public void didgeridoovalue() {
+        didgeridooItem = new ItemStack(Material.STICK);
+        ItemMeta meta = didgeridooItem.getItemMeta();
+        if (meta != null) {
+            FileConfiguration didgeridooConfig = InstrumentConfigManager.get("Didgeridoo");
+            String didgeridooName = "&6Epic Didgeridoo";
+            if (didgeridooConfig != null) {
+                didgeridooName = didgeridooConfig.getString("didgeridoo-name", didgeridooName);
+            }
+            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', didgeridooName));
+            didgeridooItem.setItemMeta(meta);
+        }
+    }
+
     public void flutevalue() {
         fluteItem = new ItemStack(Material.STICK);
         ItemMeta meta = fluteItem.getItemMeta();
@@ -340,6 +477,20 @@ public class NoteBlockMelody extends JavaPlugin {
             }
             meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', fluteName));
             fluteItem.setItemMeta(meta);
+        }
+    }
+
+    public void guitarvalue() {
+        guitarItem = new ItemStack(Material.STICK);
+        ItemMeta meta = guitarItem.getItemMeta();
+        if (meta != null) {
+            FileConfiguration guitarConfig = InstrumentConfigManager.get("Guitar");
+            String guitarName = "&6Epic Guitar";
+            if (guitarConfig != null) {
+                guitarName = guitarConfig.getString("guitar-name", guitarName);
+            }
+            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', guitarName));
+            guitarItem.setItemMeta(meta);
         }
     }
 
@@ -371,6 +522,34 @@ public class NoteBlockMelody extends JavaPlugin {
         }
     }
 
+    public void ironXylophonevalue() {
+        ironXylophoneItem = new ItemStack(Material.STICK);
+        ItemMeta meta = ironXylophoneItem.getItemMeta();
+        if (meta != null) {
+            FileConfiguration ironXylophoneConfig = InstrumentConfigManager.get("IronXylophone");
+            String ironXylophoneName = "&6Epic Iron Xylophone";
+            if (ironXylophoneConfig != null) {
+                ironXylophoneName = ironXylophoneConfig.getString("iron_xylophone-name", ironXylophoneName);
+            }
+            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', ironXylophoneName));
+            ironXylophoneItem.setItemMeta(meta);
+        }
+    }
+
+        public void plingvalue() {
+        plingItem = new ItemStack(Material.STICK);
+        ItemMeta meta = plingItem.getItemMeta();
+        if (meta != null) {
+            FileConfiguration plingConfig = InstrumentConfigManager.get("Pling");
+            String plingName = "&6Epic Pling";
+            if (plingConfig != null) {
+                plingName = plingConfig.getString("pling-name", plingName);
+            }
+            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', plingName));
+            plingItem.setItemMeta(meta);
+        }
+    }
+
     public void snareDrumvalue() {
         snareDrumItem = new ItemStack(Material.STICK);
         ItemMeta meta = snareDrumItem.getItemMeta();
@@ -397,6 +576,20 @@ public class NoteBlockMelody extends JavaPlugin {
             }
             meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', xylophoneName));
             xylophoneItem.setItemMeta(meta);
+        }
+    }
+
+    public void extravalue() {
+        extraItem = new ItemStack(Material.STICK);
+        ItemMeta meta = extraItem.getItemMeta();
+        if (meta != null) {
+            FileConfiguration extraConfig = InstrumentConfigManager.get("Extra");
+            String extraName = "&6Epic Extra";
+            if (extraConfig != null) {
+                extraName = extraConfig.getString("extra-name", extraName);
+            }
+            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', extraName));
+            extraItem.setItemMeta(meta);
         }
     }
 
@@ -452,13 +645,23 @@ public class NoteBlockMelody extends JavaPlugin {
         }
     }
 
-    private void createGuitarRecipe() {
-        NamespacedKey key = new NamespacedKey(this, "guitar_recipe");
-        ShapedRecipe recipe = new ShapedRecipe(key, guitarItem);
-        recipe.shape("W  ", " SW", " WW");
+    private void createBanjoRecipe() {
+        NamespacedKey key = new NamespacedKey(this, "banjo_recipe");
+        ShapedRecipe recipe = new ShapedRecipe(key, banjoItem);
+        recipe.shape(" W ", " SW", "W W");
         recipe.setIngredient('W', getWoodMaterial());
         recipe.setIngredient('S', getStringMaterial());
-        addRecipeSafely(key, recipe, "Guitar");
+        addRecipeSafely(key, recipe, "Banjo");
+    }
+
+    private void createBaseDrumRecipe() {
+        NamespacedKey key = new NamespacedKey(this, "basedrum_recipe");
+        ShapedRecipe recipe = new ShapedRecipe(key, baseDrumItem);
+        recipe.shape("LIL", "LWL", "LIL");
+        recipe.setIngredient('W', getWoodMaterial());
+        recipe.setIngredient('I', getIronMaterial());
+        recipe.setIngredient('L', Material.STRING);
+        addRecipeSafely(key, recipe, "BaseDrum");
     }
 
     private void createBassRecipe() {
@@ -480,6 +683,16 @@ public class NoteBlockMelody extends JavaPlugin {
         recipe.setIngredient('I', getIronMaterial());
         addRecipeSafely(key, recipe, "Bell");
     }
+
+    private void createBitRecipe() {
+        NamespacedKey key = new NamespacedKey(this, "bit_recipe");
+        ShapedRecipe recipe = new ShapedRecipe(key, guitarItem);
+        recipe.shape("III", "   ", "IWI");
+        recipe.setIngredient('W', getWoodMaterial());
+        recipe.setIngredient('I', getStringMaterial());
+        addRecipeSafely(key, recipe, "Bit");
+    }
+
     private void createChimeRecipe() {
         NamespacedKey key = new NamespacedKey(this, "chime_recipe");
         ShapedRecipe recipe = new ShapedRecipe(key, chimeItem);
@@ -489,12 +702,40 @@ public class NoteBlockMelody extends JavaPlugin {
         addRecipeSafely(key, recipe, "Chime");
     }
 
+    private void createCowBellRecipe() {
+        NamespacedKey key = new NamespacedKey(this, "cow_bell_recipe");
+        ShapedRecipe recipe = new ShapedRecipe(key, bellItem);
+        recipe.shape(" W ", "IWI", "ISI");
+        recipe.setIngredient('W', Material.STICK);
+        recipe.setIngredient('S', getStringMaterial());
+        recipe.setIngredient('I', getIronMaterial());
+        addRecipeSafely(key, recipe, "CowBell");
+    }
+
+    private void createDidgeridooRecipe() {
+        NamespacedKey key = new NamespacedKey(this, "didgeridoo_recipe");
+        ShapedRecipe recipe = new ShapedRecipe(key, didgeridooItem);
+        recipe.shape("WIW", "W W", "WIW");
+        recipe.setIngredient('W', Material.STICK);
+        recipe.setIngredient('I', getIronMaterial());
+        addRecipeSafely(key, recipe, "Didgeridoo");
+    }
+
     private void createFluteRecipe() {
         NamespacedKey key = new NamespacedKey(this, "flute_recipe");
         ShapedRecipe recipe = new ShapedRecipe(key, fluteItem);
         recipe.shape("WWW", "   ", "   ");
         recipe.setIngredient('W', Material.STICK);
         addRecipeSafely(key, recipe, "Flute");
+    }
+
+    private void createGuitarRecipe() {
+        NamespacedKey key = new NamespacedKey(this, "guitar_recipe");
+        ShapedRecipe recipe = new ShapedRecipe(key, guitarItem);
+        recipe.shape("W  ", " SW", " WW");
+        recipe.setIngredient('W', getWoodMaterial());
+        recipe.setIngredient('S', getStringMaterial());
+        addRecipeSafely(key, recipe, "Guitar");
     }
 
     private void createHarpRecipe() {
@@ -515,6 +756,24 @@ public class NoteBlockMelody extends JavaPlugin {
         addRecipeSafely(key, recipe, "Hat");
     }
 
+    private void createIronXylophoneRecipe() {
+        NamespacedKey key = new NamespacedKey(this, "iron_xylophone_recipe");
+        ShapedRecipe recipe = new ShapedRecipe(key, ironXylophoneItem);
+        recipe.shape("   ", "WWW", "III");
+        recipe.setIngredient('W', getWoodMaterial());
+        recipe.setIngredient('I', getIronMaterial());
+        addRecipeSafely(key, recipe, "IronXylophone");
+    }
+
+    private void createPlingRecipe() {
+        NamespacedKey key = new NamespacedKey(this, "pling_recipe");
+        ShapedRecipe recipe = new ShapedRecipe(key, plingItem);
+        recipe.shape("III", "   ", "WIW");
+        recipe.setIngredient('W', getWoodMaterial());
+        recipe.setIngredient('I', getIronMaterial());
+        addRecipeSafely(key, recipe, "Pling");
+    }
+
     private void createSnareDrumRecipe() {
         NamespacedKey key = new NamespacedKey(this, "snaredrum_recipe");
         ShapedRecipe recipe = new ShapedRecipe(key, snareDrumItem);
@@ -532,6 +791,16 @@ public class NoteBlockMelody extends JavaPlugin {
         recipe.setIngredient('W', getWoodMaterial());
         recipe.setIngredient('I', getIronMaterial());
         addRecipeSafely(key, recipe, "Xylophone");
+    }
+
+    private void createExtraRecipe() {
+        NamespacedKey key = new NamespacedKey(this, "extra_recipe");
+        ShapedRecipe recipe = new ShapedRecipe(key, guitarItem);
+        recipe.shape("IWI", "WSW", "SIS");
+        recipe.setIngredient('W', getWoodMaterial());
+        recipe.setIngredient('S', getStringMaterial());
+        recipe.setIngredient('I', getIronMaterial());
+        addRecipeSafely(key, recipe, "Extra");
     }
 
 }

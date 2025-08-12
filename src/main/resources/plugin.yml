@@ -18,15 +18,30 @@ commands:
   guitar:
     description: Opens the guitar GUI
     usage: /guitar
+  banjo:
+    description: Opens the banjo GUI
+    usage: /banjo
+  base_drum:
+    description: Opens the base_drum GUI
+    usage: /base_drum
   bass:
     description: Opens the bass GUI
     usage: /bass
   bell:
     description: Opens the bell GUI
     usage: /bell
+  bit:
+    description: Opens the bit GUI
+    usage: /bit
   chime:
     description: Opens the chime GUI
     usage: /chime
+  cow_bell:
+    description: Opens the cow bell GUI
+    usage: /cow_bell
+  didgeridoo:
+    description: Opens the didgeridoo GUI
+    usage: /didgeridoo
   flute:
     description: Opens the flute GUI
     usage: /flute
@@ -36,12 +51,21 @@ commands:
   hat:
     description: Opens the hat GUI
     usage: /hat
+  pling:
+    description: Opens the pling GUI
+    usage: /pling
+  iron_xylophone:
+    description: Opens the iron xylophone GUI
+    usage: /iron_xylophone
   snare_drum:
     description: Opens the snare_drum GUI
     usage: /snare_drum
   xylophone:
     description: Opens the xylophone GUI
     usage: /xylophone
+  extra:
+    description: Opens the extra GUI
+    usage: /extra
 
 permissions:
   nbm.use:
