@@ -24,14 +24,14 @@ public class NBMCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "This command can only be used by players!");
+            sender.sendMessage(ChatColor.RED +  plugin.translate("this-command-player-only"));
             return true;
         }
 
         Player player = (Player) sender;
         
         if (!player.hasPermission("nbm.use")) {
-            player.sendMessage(ChatColor.RED + "You don't have permission to use this command!");
+            player.sendMessage(ChatColor.RED + plugin.translate("dont-have-permission-to-use"));
             return true;
         }
 
@@ -39,65 +39,81 @@ public class NBMCommand implements CommandExecutor {
             if (player.hasPermission("nbm.admin")) {
                 reloadAllConfigs(player);
             } else {
-                player.sendMessage(ChatColor.RED + "You don't have admin permission to use this command.");
+                player.sendMessage(ChatColor.RED + plugin.translate("dont-have-permission-to-use"));
             }
             return true;
         }
 
-        player.sendMessage(ChatColor.GOLD + "=== NoteBlockMelody Commands ===");
+        player.sendMessage(ChatColor.GOLD + plugin.translate("command-help-header"));
         if (player.hasPermission("nbm.admin")) {
             player.sendMessage(ChatColor.YELLOW + "/nbm reload " + ChatColor.WHITE + "- Reload all instrument configs (Admin)");
         }
-        player.sendMessage(ChatColor.YELLOW + "/guitar " + ChatColor.WHITE + "- Open guitar GUI");
-        player.sendMessage(ChatColor.YELLOW + "/bass " + ChatColor.WHITE + "- Open bass GUI");
-        player.sendMessage(ChatColor.YELLOW + "/bell " + ChatColor.WHITE + "- Open bell GUI");
-        player.sendMessage(ChatColor.YELLOW + "/chime " + ChatColor.WHITE + "- Open chime GUI");
-        player.sendMessage(ChatColor.YELLOW + "/flute " + ChatColor.WHITE + "- Open flute GUI");
-        player.sendMessage(ChatColor.YELLOW + "/harp " + ChatColor.WHITE + "- Open harp GUI");
-        player.sendMessage(ChatColor.YELLOW + "/hat " + ChatColor.WHITE + "- Open hat GUI");
-        player.sendMessage(ChatColor.YELLOW + "/snare_drum " + ChatColor.WHITE + "- Open snare drum GUI");
-        player.sendMessage(ChatColor.YELLOW + "/xylophone " + ChatColor.WHITE + "- Open xylophone GUI");
+        player.sendMessage(ChatColor.YELLOW + "/banjo " + ChatColor.WHITE + plugin.translate("command-help-banjo"));
+        player.sendMessage(ChatColor.YELLOW + "/base_drum " + ChatColor.WHITE + plugin.translate("command-help-base_drum"));
+        player.sendMessage(ChatColor.YELLOW + "/bass " + ChatColor.WHITE + plugin.translate("command-help-bass"));
+        player.sendMessage(ChatColor.YELLOW + "/bell " + ChatColor.WHITE + plugin.translate("command-help-bell"));
+        player.sendMessage(ChatColor.YELLOW + "/bit " + ChatColor.WHITE + plugin.translate("command-help-bit"));
+        player.sendMessage(ChatColor.YELLOW + "/chime " + ChatColor.WHITE + plugin.translate("command-help-chime"));
+        player.sendMessage(ChatColor.YELLOW + "/cow_bell " + ChatColor.WHITE + plugin.translate("command-help-cow_bell"));
+        player.sendMessage(ChatColor.YELLOW + "/didgeridoo " + ChatColor.WHITE + plugin.translate("command-help-didgeridoo"));
+        player.sendMessage(ChatColor.YELLOW + "/flute " + ChatColor.WHITE + plugin.translate("command-help-flute"));
+        player.sendMessage(ChatColor.YELLOW + "/guitar " + ChatColor.WHITE + plugin.translate("command-help-guiter"));
+        player.sendMessage(ChatColor.YELLOW + "/harp " + ChatColor.WHITE + plugin.translate("command-help-harp"));
+        player.sendMessage(ChatColor.YELLOW + "/hat " + ChatColor.WHITE + plugin.translate("command-help-hat"));
+        player.sendMessage(ChatColor.YELLOW + "/iron_xylophone " + ChatColor.WHITE + plugin.translate("command-help-iron_xylophone"));
+        player.sendMessage(ChatColor.YELLOW + "/pling " + ChatColor.WHITE + plugin.translate("command-help-pling"));
+        player.sendMessage(ChatColor.YELLOW + "/snare_drum " + ChatColor.WHITE + plugin.translate("command-help-snare_drum"));
+        player.sendMessage(ChatColor.YELLOW + "/xylophone " + ChatColor.WHITE + plugin.translate("command-help-xylophone"));
+        player.sendMessage(ChatColor.YELLOW + "/extra " + ChatColor.WHITE + plugin.translate("command-help-extra"));
 
         return true;
     }
 
     private void reloadAllConfigs(Player player) {
         Map<String, String> configFiles = new HashMap<>();
-        configFiles.put("Guitar", "Guitar.yml");
+        configFiles.put("Banjo", "Banjo.yml");
+        configFiles.put("BaseDrum", "BaseDrum.yml");
         configFiles.put("Bass", "Bass.yml");
         configFiles.put("Bell", "Bell.yml");
+        configFiles.put("Bit", "Bit.yml");
         configFiles.put("Chime", "Chime.yml");
+        configFiles.put("CowBell", "CowBell.yml");
+        configFiles.put("Didgeridoo", "Didgeridoo.yml");
         configFiles.put("Flute", "Flute.yml");
+        configFiles.put("Guitar", "Guitar.yml");
         configFiles.put("Harp", "Harp.yml");
         configFiles.put("Hat", "Hat.yml");
+        configFiles.put("IronXylophone", "IronXylophone.yml");
+        configFiles.put("Pling", "Pling.yml");
         configFiles.put("SnareDrum", "SnareDrum.yml");
         configFiles.put("Xylophone", "Xylophone.yml");
+        configFiles.put("Extra", "Extra.yml");
 
         int successCount = 0;
         int failCount = 0;
 
-        player.sendMessage(ChatColor.YELLOW + "Starting to reload all instrument configs...");
+        player.sendMessage(ChatColor.YELLOW + plugin.translate("starting-to-reload"));
 
         for (Map.Entry<String, String> entry : configFiles.entrySet()) {
             String instrumentName = entry.getKey();
             String fileName = entry.getValue();
             
-            File file = new File(plugin.getDataFolder(), fileName);
+            File file = new File(plugin.getDataFolder(), "instruments" + File.separator + fileName);
             if (file.exists()) {
                 try {
                     FileConfiguration config = YamlConfiguration.loadConfiguration(file);
                     InstrumentConfigManager.getAll().put(instrumentName, config);
                     successCount++;
-                    plugin.getLogger().info("[NBM] Successfully reloaded " + fileName);
+                    plugin.getLogger().info(plugin.translate("prefix") + " " + plugin.translate("successfully-reloaded").replaceAll("\\$1",fileName));
                 } catch (Exception e) {
                     failCount++;
-                    plugin.getLogger().warning("[NBM] Failed to reload " + fileName + ": " + e.getMessage());
-                    player.sendMessage(ChatColor.RED + "Failed to reload " + fileName + ": " + e.getMessage());
+                    plugin.getLogger().warning(plugin.translate("prefix") + " " + plugin.translate("faild-to-reloaded").replaceAll("\\$1",fileName) + ": " + e.getMessage());
+                    player.sendMessage(ChatColor.RED + plugin.translate("prefix") + " " + plugin.translate("faild-to-reloaded").replaceAll("\\$1",fileName) + ": " + e.getMessage());
                 }
             } else {
                 failCount++;
-                plugin.getLogger().warning("[NBM] Config file not found: " + fileName);
-                player.sendMessage(ChatColor.RED + fileName + " not found!");
+                plugin.getLogger().warning(plugin.translate("prefix") + " " + plugin.translate("config-file-not-found").replaceAll("\\$1",fileName));
+                player.sendMessage(ChatColor.RED + plugin.translate("file-not-found").replaceAll("\\$1",fileName));
             }
         }
 
@@ -105,43 +121,84 @@ public class NBMCommand implements CommandExecutor {
         try {
             plugin.reloadConfig();
             plugin.config = plugin.getConfig();
-            player.sendMessage(ChatColor.GREEN + "Main config reloaded!");
+            player.sendMessage(ChatColor.GREEN + plugin.translate("reloaded-main-config"));
         } catch (Exception e) {
-            player.sendMessage(ChatColor.RED + "Failed to reload main config: " + e.getMessage());
+            player.sendMessage(ChatColor.RED + plugin.translate("failed-to-reloaded-main-config") + e.getMessage());
+        }
+
+        try {
+            plugin.langLoad();
+            player.sendMessage(ChatColor.GREEN + plugin.translate("loaded-lang-file"));
+        } catch (Exception e) {
+            player.sendMessage(ChatColor.RED + plugin.translate("faild-to-load-lang-file") + e.getMessage());
         }
 
         // Reload instrument items after config reload
         if (successCount > 0) {
             try {
-                plugin.guitarvalue();
+                plugin.banjovalue();
+                plugin.baseDrumvalue();
                 plugin.bassvalue();
                 plugin.bellvalue();
+                plugin.bitvalue();
                 plugin.chimevalue();
+                plugin.cowBellvalue();
+                plugin.didgeridoovalue();
                 plugin.flutevalue();
+                plugin.guitarvalue();
                 plugin.harpvalue();
                 plugin.hatvalue();
+                plugin.ironXylophonevalue();
+                plugin.plingvalue();
                 plugin.snareDrumvalue();
                 plugin.xylophonevalue();
-                player.sendMessage(ChatColor.GREEN + "Instrument items have been updated!");
+                plugin.extravalue();
+                player.sendMessage(ChatColor.GREEN + plugin.translate("updated-instrument-item"));
             } catch (Exception e) {
-                player.sendMessage(ChatColor.RED + "Failed to update instrument items: " + e.getMessage());
+                player.sendMessage(ChatColor.RED + plugin.translate("failed-to-update-instrument-item") + e.getMessage());
             }
         }
 
         if (successCount > 0) {
-            player.sendMessage(ChatColor.GREEN + "Successfully reloaded " + successCount + " config files!");
+            player.sendMessage(ChatColor.GREEN + plugin.translate("reloaded-config-files").replaceAll("\\$1",Integer.toString(successCount)));
         }
         
         if (failCount > 0) {
-            player.sendMessage(ChatColor.RED + "Failed to reload " + failCount + " config files!");
+            player.sendMessage(ChatColor.RED + plugin.translate("failed-to-reloaded-config-files").replaceAll("\\$1",Integer.toString(failCount)));
         }
 
         if (successCount == configFiles.size()) {
-            player.sendMessage(ChatColor.GREEN + "All instrument configs have been reloaded successfully!");
+            player.sendMessage(ChatColor.GREEN + plugin.translate("reloaded-all-instruments-configs"));
         } else if (successCount > 0) {
-            player.sendMessage(ChatColor.YELLOW + "Some configs were reloaded successfully, but some failed.");
+            player.sendMessage(ChatColor.YELLOW + plugin.translate("faild-to-reload-a-part-of-configs"));
         } else {
-            player.sendMessage(ChatColor.RED + "No config files could be reloaded!");
+            player.sendMessage(ChatColor.RED + plugin.translate("no-reloaded-configs"));
+        }
+
+        try {
+            //   plugin.removeAllRecipes();
+          if(plugin.config.getBoolean("craftable")) {
+              plugin.createRecipe(plugin.banjoItem, plugin.banjoIngredients, plugin.banjoPattern, "Banjo");
+              plugin.createRecipe(plugin.baseDrumItem, plugin.baseDrumIngredients, plugin.baseDrumPattern, "BaseDrum");
+              plugin.createRecipe(plugin.baseDrumItem, plugin.baseDrumIngredients, plugin.baseDrumPattern, "Bass");
+              plugin.createRecipe(plugin.bellItem, plugin.bellIngredients, plugin.bellPattern, "Bell");
+              plugin.createRecipe(plugin.bitItem, plugin.bitIngredients, plugin.bitPattern, "Bit");
+              plugin.createRecipe(plugin.chimeItem, plugin.chimeIngredients, plugin.chimePattern, "Chime");
+              plugin.createRecipe(plugin.cowBellItem, plugin.cowBellIngredients, plugin.cowBellPattern, "CowBell");
+              plugin.createRecipe(plugin.didgeridooItem, plugin.didgeridooIngredients, plugin.didgeridooPattern, "Didgeridoo");
+              plugin.createRecipe(plugin.fluteItem, plugin.fluteIngredients, plugin.flutePattern, "Flute");
+              plugin.createRecipe(plugin.guitarItem, plugin.guitarIngredients, plugin.guitarPattern, "Guitar");
+              plugin.createRecipe(plugin.harpItem, plugin.harpIngredients, plugin.harpPattern, "Harp");
+              plugin.createRecipe(plugin.hatItem, plugin.hatIngredients, plugin.hatPattern, "Hat");
+              plugin.createRecipe(plugin.ironXylophoneItem, plugin.ironXylophoneIngredients, plugin.ironXylophonePattern, "IronXylophone");
+              plugin.createRecipe(plugin.snareDrumItem, plugin.snareDrumIngredients, plugin.snareDrumPattern, "SnareDrum");
+              plugin.createRecipe(plugin.plingItem, plugin.plingIngredients, plugin.plingPattern, "Pling");
+              plugin.createRecipe(plugin.xylophoneItem, plugin.xylophoneIngredients, plugin.xylophonePattern, "Xylophone");
+              plugin.createRecipe(plugin.extraItem, plugin.extraIngredients, plugin.extraPattern, "Extra");
+              player.sendMessage(ChatColor.GREEN + plugin.translate("reloaded-recipes"));
+            }
+        } catch (Exception e) {
+            player.sendMessage(ChatColor.RED + plugin.translate("faild-to-reload-recipes") + e.getMessage());
         }
     }
 }
