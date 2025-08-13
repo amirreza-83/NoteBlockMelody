@@ -15,4 +15,11 @@
 #
 ##############################
 
+# language(default: en)
+lang: en
+
+# don't touch this version information
+translation_version: 1.0
+
+# Can craft instruments (default: true)
 craftable: true

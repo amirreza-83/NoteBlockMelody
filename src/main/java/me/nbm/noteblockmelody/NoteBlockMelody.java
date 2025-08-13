@@ -39,14 +39,21 @@ import me.nbm.noteblockmelody.notes.extra.extra_event;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.material.MaterialData;
 import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.ChatColor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.io.File;
@@ -55,7 +62,10 @@ import java.util.Map;
 public class NoteBlockMelody extends JavaPlugin {
 
     public FileConfiguration config;
-    public FileConfiguration guitarConfig;
+    public File langFile;
+    public YamlConfiguration dictionaly;
+    private File defLangFile;
+    private YamlConfiguration defDictionaly;
 
     public Map<String, FileConfiguration> instrumentConfigs = new HashMap<>();
 
@@ -65,23 +75,74 @@ public class NoteBlockMelody extends JavaPlugin {
     public List<String> sounds;
     public List<Integer> stringItemPositions;
     public List<String> stringNames;
-    public ItemStack extraItem;
-    public ItemStack snareDrumItem;
-    public ItemStack xylophoneItem;
-    public ItemStack plingItem;
-    public ItemStack ironXylophoneItem;
-    public ItemStack hatItem;
-    public ItemStack harpItem;
-    public ItemStack guitarItem;
-    public ItemStack fluteItem;
-    public ItemStack didgeridooItem;
-    public ItemStack cowBellItem;
-    public ItemStack chimeItem;
-    public ItemStack bitItem;
-    public ItemStack bellItem;
-    public ItemStack bassItem;
-    public ItemStack baseDrumItem;
+
     public ItemStack banjoItem;
+    public List<String> banjoPattern;
+    public Map<String,String> banjoIngredients;
+
+    public ItemStack baseDrumItem;
+    public List<String> baseDrumPattern;
+    public Map<String,String> baseDrumIngredients;
+
+    public ItemStack bassItem;
+    public List<String> bassPattern;
+    public Map<String,String> bassIngredients;
+
+    public ItemStack bellItem;
+    public List<String> bellPattern;
+    public Map<String,String> bellIngredients;
+
+    public ItemStack bitItem;
+    public List<String> bitPattern;
+    public Map<String,String> bitIngredients;
+
+    public ItemStack chimeItem;
+    public List<String> chimePattern;
+    public Map<String,String> chimeIngredients;
+
+    public ItemStack cowBellItem;
+    public List<String> cowBellPattern;
+    public Map<String,String> cowBellIngredients;
+
+    public ItemStack didgeridooItem;
+    public List<String> didgeridooPattern;
+    public Map<String,String> didgeridooIngredients;
+
+    public ItemStack fluteItem;
+    public List<String> flutePattern;
+    public Map<String,String> fluteIngredients;
+
+    public ItemStack guitarItem;
+    public List<String> guitarPattern;
+    public Map<String,String> guitarIngredients;
+
+    public ItemStack harpItem;
+    public List<String> harpPattern;
+    public Map<String,String> harpIngredients;
+
+    public ItemStack hatItem;
+    public List<String> hatPattern;
+    public Map<String,String> hatIngredients;
+
+    public ItemStack ironXylophoneItem;
+    public List<String> ironXylophonePattern;
+    public Map<String,String> ironXylophoneIngredients;
+
+    public ItemStack plingItem;
+    public List<String> plingPattern;
+    public Map<String,String> plingIngredients;
+
+    public ItemStack snareDrumItem;
+    public List<String> snareDrumPattern;
+    public Map<String,String> snareDrumIngredients;
+
+    public ItemStack xylophoneItem;
+    public List<String> xylophonePattern;
+    public Map<String,String> xylophoneIngredients;
+
+    public ItemStack extraItem;
+    public List<String> extraPattern;
+    public Map<String,String> extraIngredients;
 
     public ConsoleCommandSender message;
 
@@ -92,8 +153,10 @@ public class NoteBlockMelody extends JavaPlugin {
         message = Bukkit.getConsoleSender();
         saveDefaultInstrumentConfigs();
         InstrumentConfigManager.init(this);
-        
+
         detectServerVersionAndUpdateConfigs();
+        
+        langLoad();
 
         getCommand("nbm").setExecutor(new NBMCommand(this));
 
@@ -153,6 +216,7 @@ public class NoteBlockMelody extends JavaPlugin {
         message.sendMessage("§6    §eNoteBlockMelody v1.7-α                   ");
         message.sendMessage("§6                                               ");
         message.sendMessage("§6           §bMade by Minestar                  ");
+        message.sendMessage("§6           §bContributed by Jekyll             ");
         message.sendMessage("§6                                               ");
         message.sendMessage("§6===============================================");
         message.sendMessage("§6 §aBanjo  §bBaseDrum   §cBass    §dBell    §eBit");
@@ -163,42 +227,42 @@ public class NoteBlockMelody extends JavaPlugin {
         message.sendMessage("§6        §2All instruments loaded!              ");
         message.sendMessage("§6===============================================");
 
-        extravalue();
-        xylophonevalue();
-        snareDrumvalue();
-        plingvalue();
-        ironXylophonevalue();
-        hatvalue();
-        harpvalue();
-        guitarvalue();
-        flutevalue();
-        didgeridoovalue();
-        cowBellvalue();
-        chimevalue();
-        bitvalue();
-        bellvalue();
-        bassvalue();
-        baseDrumvalue();
         banjovalue();
+        baseDrumvalue();
+        bassvalue();
+        bellvalue();
+        bitvalue();
+        chimevalue();
+        cowBellvalue();
+        didgeridoovalue();
+        flutevalue();
+        guitarvalue();
+        harpvalue();
+        hatvalue();
+        ironXylophonevalue();
+        plingvalue();
+        snareDrumvalue();
+        xylophonevalue();
+        extravalue();
 
         if(config.getBoolean("craftable")) {
-          createExtraRecipe();
-          createXylophoneRecipe();
-          createSnareDrumRecipe();
-          createPlingRecipe();
-          createIronXylophoneRecipe();
-          createHatRecipe();
-          createHarpRecipe();
-          createGuitarRecipe();
-          createFluteRecipe();
-          createDidgeridooRecipe();
-          createCowBellRecipe();
-          createChimeRecipe();
-          createBitRecipe();
-          createBellRecipe();
-          createBassRecipe();
-          createBaseDrumRecipe();
-          createBanjoRecipe();
+          createRecipe(banjoItem, banjoIngredients, banjoPattern, "Banjo");
+          createRecipe(baseDrumItem, baseDrumIngredients, baseDrumPattern, "BaseDrum");
+          createRecipe(baseDrumItem, baseDrumIngredients, baseDrumPattern, "Bass");
+          createRecipe(bellItem, bellIngredients, bellPattern, "Bell");
+          createRecipe(bitItem, bitIngredients, bitPattern, "Bit");
+          createRecipe(chimeItem, chimeIngredients, chimePattern, "Chime");
+          createRecipe(cowBellItem, cowBellIngredients, cowBellPattern, "CowBell");
+          createRecipe(didgeridooItem, didgeridooIngredients, didgeridooPattern, "Didgeridoo");
+          createRecipe(fluteItem, fluteIngredients, flutePattern, "Flute");
+          createRecipe(guitarItem, guitarIngredients, guitarPattern, "Guitar");
+          createRecipe(harpItem, harpIngredients, harpPattern, "Harp");
+          createRecipe(hatItem, hatIngredients, hatPattern, "Hat");
+          createRecipe(ironXylophoneItem, ironXylophoneIngredients, ironXylophonePattern, "IronXylophone");
+          createRecipe(snareDrumItem, snareDrumIngredients, snareDrumPattern, "SnareDrum");
+          createRecipe(plingItem, plingIngredients, plingPattern, "Pling");
+          createRecipe(xylophoneItem, xylophoneIngredients, xylophonePattern, "Xylophone");
+          createRecipe(extraItem, extraIngredients, extraPattern, "Extra");
         }
 
         message.sendMessage("§d===============================================");
@@ -222,32 +286,30 @@ public class NoteBlockMelody extends JavaPlugin {
         message.sendMessage("§c===============================================");
     }
     
-    private void removeAllRecipes() {
+    public void removeAllRecipes() {
         try {
             java.util.Iterator<org.bukkit.inventory.Recipe> iterator = Bukkit.recipeIterator();
             while (iterator.hasNext()) {
                 org.bukkit.inventory.Recipe recipe = iterator.next();
                 if (recipe instanceof org.bukkit.inventory.ShapedRecipe) {
                     org.bukkit.inventory.ShapedRecipe shapedRecipe = (org.bukkit.inventory.ShapedRecipe) recipe;
-                    if(config.getBoolean("craftable")) {
-                        if (shapedRecipe.getResult().isSimilar(guitarItem) ||
-                            shapedRecipe.getResult().isSimilar(baseDrumItem) ||
-                            shapedRecipe.getResult().isSimilar(bassItem) ||
-                            shapedRecipe.getResult().isSimilar(bellItem) ||
-                            shapedRecipe.getResult().isSimilar(chimeItem) ||
-                            shapedRecipe.getResult().isSimilar(cowBellItem) ||
-                            shapedRecipe.getResult().isSimilar(didgeridooItem) ||
-                            shapedRecipe.getResult().isSimilar(fluteItem) ||
-                            shapedRecipe.getResult().isSimilar(harpItem) ||
-                            shapedRecipe.getResult().isSimilar(hatItem) ||
-                            shapedRecipe.getResult().isSimilar(ironXylophoneItem) ||
-                            shapedRecipe.getResult().isSimilar(plingItem) ||
-                            shapedRecipe.getResult().isSimilar(snareDrumItem) ||
-                            shapedRecipe.getResult().isSimilar(xylophoneItem) ||
-                            shapedRecipe.getResult().isSimilar(extraItem) ) {
-                            iterator.remove();
+                    if (shapedRecipe.getResult().isSimilar(guitarItem) ||
+                        shapedRecipe.getResult().isSimilar(baseDrumItem) ||
+                        shapedRecipe.getResult().isSimilar(bassItem) ||
+                        shapedRecipe.getResult().isSimilar(bellItem) ||
+                        shapedRecipe.getResult().isSimilar(chimeItem) ||
+                        shapedRecipe.getResult().isSimilar(cowBellItem) ||
+                        shapedRecipe.getResult().isSimilar(didgeridooItem) ||
+                        shapedRecipe.getResult().isSimilar(fluteItem) ||
+                        shapedRecipe.getResult().isSimilar(harpItem) ||
+                        shapedRecipe.getResult().isSimilar(hatItem) ||
+                        shapedRecipe.getResult().isSimilar(ironXylophoneItem) ||
+                        shapedRecipe.getResult().isSimilar(plingItem) ||
+                        shapedRecipe.getResult().isSimilar(snareDrumItem) ||
+                        shapedRecipe.getResult().isSimilar(xylophoneItem) ||
+                        shapedRecipe.getResult().isSimilar(extraItem) ) {
+                        iterator.remove();
                         }
-                    }
                 }
             }
         } catch (Exception e) {
@@ -268,14 +330,14 @@ public class NoteBlockMelody extends JavaPlugin {
         message.sendMessage("§b===============================================");
         if (useModernConfigs) {
             message.sendMessage("§a Loading Modern Configs (1.13+)");
-            message.sendMessage("§6 Source: new/ folder");
+            message.sendMessage("§6 Source: instruments/ folder");
             message.sendMessage("§b----------------------------------------------");
             int loadedCount = 0;
             for (String configFile : configFiles) {
-                File targetFile = new File(getDataFolder(), configFile);
+                File targetFile = new File(getDataFolder(), "instruments" + File.separator + configFile);
                 if (!targetFile.exists()) {
-                    saveResource("new/" + configFile, false);
-                    File sourceFile = new File(getDataFolder(), "new/" + configFile);
+                    saveResource("instruments/" + configFile, false);
+                    File sourceFile = new File(getDataFolder(), "instruments/" + configFile);
                     if (sourceFile.exists()) {
                         try {
                             java.nio.file.Files.copy(sourceFile.toPath(), targetFile.toPath());
@@ -289,7 +351,7 @@ public class NoteBlockMelody extends JavaPlugin {
                     }
                 }
             }
-            File newFolder = new File(getDataFolder(), "new");
+            File newFolder = new File(getDataFolder(), "instruments");
             if (newFolder.exists() && newFolder.isDirectory()) {
                 newFolder.delete();
             }
@@ -301,8 +363,8 @@ public class NoteBlockMelody extends JavaPlugin {
             message.sendMessage("§b-----------------------------------------------");
             int loadedCount = 0;
             for (String configFile : configFiles) {
-                if (!new File(getDataFolder(), configFile).exists()) {
-                    saveResource(configFile, false);
+                if (!new File(getDataFolder(), "instruments" + File.separator + configFile).exists()) {
+                    saveResource("instruments/" + configFile, false);
                     loadedCount++;
                     String fileName = configFile.replace(".yml", "");
                     message.sendMessage("§a ✓ " + fileName);
@@ -356,267 +418,409 @@ public class NoteBlockMelody extends JavaPlugin {
                version.startsWith("1.8") || version.startsWith("1.7");
     }
 
-    public void banjovalue() {
-        banjoItem = new ItemStack(Material.STICK);
-        ItemMeta meta = banjoItem.getItemMeta();
-        if (meta != null) {
-            FileConfiguration banjoConfig = InstrumentConfigManager.get("Banjo");
-            String banjoName = "&6Epic Banjo";
-            if (banjoConfig != null) {
-                banjoName = banjoConfig.getString("banjo-name", banjoName);
-            }
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', banjoName));
-            banjoItem.setItemMeta(meta);
+    public void langLoad(){
+        String lang = config.getString("lang");
+        defLangFile = new File(getDataFolder(), "languages" + File.separator + "en.yml");
+        langFile = new File(getDataFolder(), "languages" + File.separator + lang + ".yml");   
+        if(langFile == null){
+            langFile = defLangFile;
         }
+        defDictionaly = YamlConfiguration.loadConfiguration(defLangFile);
+        dictionaly = YamlConfiguration.loadConfiguration(langFile);
+
+    }
+
+    public String translate(String key){
+        String mes = new String();
+        if(dictionaly.getString(key) == null){
+            mes = defDictionaly.getString(key);
+        }else{
+            mes = dictionaly.getString(key);
+        }
+        return mes; 
+    }
+
+    public void banjovalue() {
+        String instName = "Banjo";
+        banjoItem = getItem(instName);
+        banjoIngredients = new HashMap<>();
+        banjoIngredients.put("A", "STRING");
+        banjoIngredients.put("B", "OAK_PLANKS");
+        banjoIngredients.put("C", "STICK");
+        banjoPattern = new ArrayList<>();
+        banjoPattern.add("C  ");
+        banjoPattern.add(" AB");
+        banjoPattern.add(" BB");
+        value(banjoItem,banjoIngredients,banjoPattern,instName);
     }
 
     public void baseDrumvalue() {
-        baseDrumItem = new ItemStack(Material.STICK);
-        ItemMeta meta = baseDrumItem.getItemMeta();
-        if (meta != null) {
-            FileConfiguration BaseDrumConfig = InstrumentConfigManager.get("BaseDrum");
-            String BaseDrumName = "&6Epic Base Drum";
-            if (BaseDrumConfig != null) {
-                BaseDrumName = BaseDrumConfig.getString("base_drum-name", BaseDrumName);
-            }
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', BaseDrumName));
-            baseDrumItem.setItemMeta(meta);
-        }
+        String instName = "BaseDrum";
+        baseDrumItem = getItem(instName);
+        baseDrumIngredients = new HashMap<>();
+        baseDrumIngredients.put("A", "STRING");
+        baseDrumIngredients.put("B", "OAK_PLANKS");
+        baseDrumIngredients.put("C", "IRON_INGOT");
+        baseDrumPattern = new ArrayList<>();
+        baseDrumPattern.add("BBB");
+        baseDrumPattern.add(" C ");
+        baseDrumPattern.add("BBB");
+        value(baseDrumItem,baseDrumIngredients,baseDrumPattern,instName);
     }
 
     public void bassvalue() {
-        bassItem = new ItemStack(Material.STICK);
-        ItemMeta meta = bassItem.getItemMeta();
-        if (meta != null) {
-            FileConfiguration bassConfig = InstrumentConfigManager.get("Bass");
-            String bassName = "&6Epic Bass";
-            if (bassConfig != null) {
-                bassName = bassConfig.getString("bass-name", bassName);
-            }
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', bassName));
-            bassItem.setItemMeta(meta);
-        }
+        String instName = "Bass";
+        bassItem = getItem(instName);
+        bassIngredients = new HashMap<>();
+        bassIngredients.put("A", "STRING");
+        bassIngredients.put("B", "OAK_PLANKS");
+        bassIngredients.put("C", "IRON_INGOT");
+        bassPattern = new ArrayList<>();
+        bassPattern.add("CA ");
+        bassPattern.add("BA ");
+        bassPattern.add("B  ");
+        value(bassItem,bassIngredients,bassPattern,instName);
     }
 
     public void bellvalue() {
-        bellItem = new ItemStack(Material.STICK);
-        ItemMeta meta = bellItem.getItemMeta();
-        if (meta != null) {
-            FileConfiguration bellConfig = InstrumentConfigManager.get("Bell");
-            String bellName = "&6Epic Bell";
-            if (bellConfig != null) {
-                bellName = bellConfig.getString("bell-name", bellName);
-            }
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', bellName));
-            bellItem.setItemMeta(meta);
-        }
-    }
-    public void bitvalue() {
-        bitItem = new ItemStack(Material.STICK);
-        ItemMeta meta = bitItem.getItemMeta();
-        if (meta != null) {
-            FileConfiguration bitConfig = InstrumentConfigManager.get("Bit");
-            String bitName = "&6Epic Bit";
-            if (bitConfig != null) {
-                bitName = bitConfig.getString("bit-name", bitName);
-            }
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', bitName));
-            bitItem.setItemMeta(meta);
-        }
-    }
-    public void chimevalue() {
-        chimeItem = new ItemStack(Material.STICK);
-        ItemMeta meta = chimeItem.getItemMeta();
-        if (meta != null) {
-            FileConfiguration chimeConfig = InstrumentConfigManager.get("Chime");
-            String chimeName = "&6Epic Chime";
-            if (chimeConfig != null) {
-                chimeName = chimeConfig.getString("chime-name", chimeName);
-            }
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', chimeName));
-            chimeItem.setItemMeta(meta);
-        }
+        String instName = "Bell";
+        bellItem = getItem(instName);
+        bellIngredients = new HashMap<>();
+        bellIngredients.put("A", "STICK");
+        bellIngredients.put("B", "STRING");
+        bellIngredients.put("C", "IRON_INGOT");
+        bellPattern = new ArrayList<>();
+        bellPattern.add(" A ");
+        bellPattern.add(" A ");
+        bellPattern.add("CBC");
+        value(bellItem,bellIngredients,bellPattern,instName);
     }
 
-        public void cowBellvalue() {
-        cowBellItem = new ItemStack(Material.STICK);
-        ItemMeta meta = cowBellItem.getItemMeta();
-        if (meta != null) {
-            FileConfiguration CowBellConfig = InstrumentConfigManager.get("CowBell");
-            String CowBellName = "&6Epic Cow Bell";
-            if (CowBellConfig != null) {
-                CowBellName = CowBellConfig.getString("cow_bell-name", CowBellName);
-            }
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', CowBellName));
-            cowBellItem.setItemMeta(meta);
-        }
+    public void bitvalue() {
+        String instName = "Bit";
+        bitItem = getItem(instName);
+        bitIngredients = new HashMap<>();
+        bitIngredients.put("A", "STICK");
+        bitIngredients.put("B", "OAK_PLANKS");
+        bitIngredients.put("C", "IRON_INGOT");
+        bitPattern = new ArrayList<>();
+        bitPattern.add("CAC");
+        bitPattern.add("CBC");
+        bitPattern.add("CBC");
+        value(bitItem,bitIngredients,bitPattern,instName);
+    }
+
+    public void chimevalue() {
+        String instName = "Chime";
+        chimeItem = getItem(instName);
+        chimeIngredients = new HashMap<>();
+        chimeIngredients.put("B", "OAK_PLANKS");
+        chimeIngredients.put("C", "IRON_INGOT");
+        chimePattern = new ArrayList<>();
+        chimePattern.add("BBB");
+        chimePattern.add("CCC");
+        chimePattern.add(" CC");
+        value(chimeItem,chimeIngredients,chimePattern,instName);
+    }
+
+    public void cowBellvalue() {
+        String instName = "CowBell";
+        cowBellItem = getItem(instName);
+        cowBellIngredients = new HashMap<>();
+        cowBellIngredients.put("A", "STICK");
+        cowBellIngredients.put("B", "OAK_PLANKS");
+        cowBellIngredients.put("C", "IRON_INGOT");
+        cowBellPattern = new ArrayList<>();
+        cowBellPattern.add(" A ");
+        cowBellPattern.add("CCC");
+        cowBellPattern.add("CBC");
+        value(cowBellItem,cowBellIngredients,cowBellPattern,instName);
     }
 
     public void didgeridoovalue() {
-        didgeridooItem = new ItemStack(Material.STICK);
-        ItemMeta meta = didgeridooItem.getItemMeta();
-        if (meta != null) {
-            FileConfiguration didgeridooConfig = InstrumentConfigManager.get("Didgeridoo");
-            String didgeridooName = "&6Epic Didgeridoo";
-            if (didgeridooConfig != null) {
-                didgeridooName = didgeridooConfig.getString("didgeridoo-name", didgeridooName);
-            }
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', didgeridooName));
-            didgeridooItem.setItemMeta(meta);
-        }
+        String instName = "Didgeridoo";
+        didgeridooItem = getItem(instName);
+        didgeridooIngredients = new HashMap<>();
+        didgeridooIngredients.put("B", "OAK_PLANKS");
+        didgeridooIngredients.put("C", "IRON_INGOT");
+        didgeridooPattern = new ArrayList<>();
+        didgeridooPattern.add("BCB");
+        didgeridooPattern.add("B B");
+        didgeridooPattern.add("BCB");
+        value(didgeridooItem,didgeridooIngredients,didgeridooPattern,instName);
     }
 
     public void flutevalue() {
-        fluteItem = new ItemStack(Material.STICK);
-        ItemMeta meta = fluteItem.getItemMeta();
-        if (meta != null) {
-            FileConfiguration fluteConfig = InstrumentConfigManager.get("Flute");
-            String fluteName = "&6Epic Flute";
-            if (fluteConfig != null) {
-                fluteName = fluteConfig.getString("flute-name", fluteName);
-            }
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', fluteName));
-            fluteItem.setItemMeta(meta);
-        }
+        String instName = "Flute";
+        fluteItem = getItem(instName);
+        fluteIngredients = new HashMap<>();
+        fluteIngredients.put("A", "STICK");
+        flutePattern = new ArrayList<>();
+        flutePattern.add("AAA");
+        value(fluteItem,fluteIngredients,flutePattern,instName);
     }
 
     public void guitarvalue() {
-        guitarItem = new ItemStack(Material.STICK);
-        ItemMeta meta = guitarItem.getItemMeta();
-        if (meta != null) {
-            FileConfiguration guitarConfig = InstrumentConfigManager.get("Guitar");
-            String guitarName = "&6Epic Guitar";
-            if (guitarConfig != null) {
-                guitarName = guitarConfig.getString("guitar-name", guitarName);
-            }
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', guitarName));
-            guitarItem.setItemMeta(meta);
-        }
+        String instName = "Guitar";
+        guitarItem = getItem(instName);
+        guitarIngredients = new HashMap<>();
+        guitarIngredients.put("A", "STRING");
+        guitarIngredients.put("B", "OAK_PLANKS");
+        guitarPattern = new ArrayList<>();
+        guitarPattern.add("B  ");
+        guitarPattern.add(" AB");
+        guitarPattern.add(" BB");
+        value(guitarItem,guitarIngredients,guitarPattern,instName);
     }
 
     public void harpvalue() {
-        harpItem = new ItemStack(Material.STICK);
-        ItemMeta meta = harpItem.getItemMeta();
-        if (meta != null) {
-            FileConfiguration harpConfig = InstrumentConfigManager.get("Harp");
-            String harpName = "&6Epic Harp";
-            if (harpConfig != null) {
-                harpName = harpConfig.getString("harp-name", harpName);
-            }
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', harpName));
-            harpItem.setItemMeta(meta);
-        }
+        String instName = "Harp";
+        harpItem = getItem(instName);
+        harpIngredients = new HashMap<>();
+        harpIngredients.put("A", "STRING");
+        harpIngredients.put("B", "OAK_PLANKS");
+        harpPattern = new ArrayList<>();
+        harpPattern.add(" AB");
+        harpPattern.add(" AB");
+        harpPattern.add("ABB");
+        value(harpItem,harpIngredients,harpPattern,instName);
     }
 
     public void hatvalue() {
-        hatItem = new ItemStack(Material.STICK);
-        ItemMeta meta = hatItem.getItemMeta();
-        if (meta != null) {
-            FileConfiguration hatConfig = InstrumentConfigManager.get("Hat");
-            String hatName = "&6Epic Hat";
-            if (hatConfig != null) {
-                hatName = hatConfig.getString("hat-name", hatName);
-            }
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', hatName));
-            hatItem.setItemMeta(meta);
-        }
+        String instName = "Hat";
+        hatItem = getItem(instName);
+        hatIngredients = new HashMap<>();
+        hatIngredients.put("B", "OAK_PLANKS");
+        hatIngredients.put("C", "IRON_INGOT");
+        hatPattern = new ArrayList<>();
+        hatPattern.add("CCC");
+        hatPattern.add(" B ");
+        hatPattern.add(" B ");
+        value(hatItem,hatIngredients,hatPattern,instName);
     }
 
     public void ironXylophonevalue() {
-        ironXylophoneItem = new ItemStack(Material.STICK);
-        ItemMeta meta = ironXylophoneItem.getItemMeta();
-        if (meta != null) {
-            FileConfiguration ironXylophoneConfig = InstrumentConfigManager.get("IronXylophone");
-            String ironXylophoneName = "&6Epic Iron Xylophone";
-            if (ironXylophoneConfig != null) {
-                ironXylophoneName = ironXylophoneConfig.getString("iron_xylophone-name", ironXylophoneName);
-            }
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', ironXylophoneName));
-            ironXylophoneItem.setItemMeta(meta);
-        }
+        String instName = "IronXylophone";
+        ironXylophoneItem = getItem(instName);
+        ironXylophoneIngredients = new HashMap<>();
+        ironXylophoneIngredients.put("B", "OAK_PLANKS");
+        ironXylophoneIngredients.put("C", "IRON_INGOT");
+        ironXylophonePattern = new ArrayList<>();
+        ironXylophonePattern.add("CCC");
+        ironXylophonePattern.add("BBB");
+        value(ironXylophoneItem,ironXylophoneIngredients,ironXylophonePattern,instName);
     }
 
-        public void plingvalue() {
-        plingItem = new ItemStack(Material.STICK);
-        ItemMeta meta = plingItem.getItemMeta();
-        if (meta != null) {
-            FileConfiguration plingConfig = InstrumentConfigManager.get("Pling");
-            String plingName = "&6Epic Pling";
-            if (plingConfig != null) {
-                plingName = plingConfig.getString("pling-name", plingName);
-            }
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', plingName));
-            plingItem.setItemMeta(meta);
-        }
+    public void plingvalue() {
+        String instName = "Pling";
+        plingItem = getItem(instName);
+        plingIngredients = new HashMap<>();
+        plingIngredients.put("B", "OAK_PLANKS");
+        plingIngredients.put("C", "IRON_INGOT");
+        plingPattern = new ArrayList<>();
+        plingPattern.add("CCC");
+        plingPattern.add("BBB");
+        plingPattern.add("B B");
+        value(plingItem,plingIngredients,plingPattern,instName);
     }
 
     public void snareDrumvalue() {
-        snareDrumItem = new ItemStack(Material.STICK);
-        ItemMeta meta = snareDrumItem.getItemMeta();
-        if (meta != null) {
-            FileConfiguration SnareDrumConfig = InstrumentConfigManager.get("SnareDrum");
-            String SnareDrumName = "&6Epic Snare Drum";
-            if (SnareDrumConfig != null) {
-                SnareDrumName = SnareDrumConfig.getString("snare_drum-name", SnareDrumName);
-            }
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', SnareDrumName));
-            snareDrumItem.setItemMeta(meta);
-        }
+        String instName = "SnareDrum";
+        snareDrumItem = getItem(instName);
+        snareDrumIngredients = new HashMap<>();
+        snareDrumIngredients.put("B", "OAK_PLANKS");
+        snareDrumIngredients.put("C", "IRON_INGOT");
+        snareDrumPattern = new ArrayList<>();
+        snareDrumPattern.add("CCC");
+        snareDrumPattern.add("   ");
+        snareDrumPattern.add("BCB");
+        value(snareDrumItem,snareDrumIngredients,snareDrumPattern,instName);
     }
 
-
     public void xylophonevalue() {
-        xylophoneItem = new ItemStack(Material.STICK);
-        ItemMeta meta = xylophoneItem.getItemMeta();
-        if (meta != null) {
-            FileConfiguration xylophoneConfig = InstrumentConfigManager.get("Xylophone");
-            String xylophoneName = "&6Epic Xylophone";
-            if (xylophoneConfig != null) {
-                xylophoneName = xylophoneConfig.getString("xylophone-name", xylophoneName);
-            }
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', xylophoneName));
-            xylophoneItem.setItemMeta(meta);
-        }
+        String instName = "Xylophone";
+        xylophoneItem = getItem(instName);
+        xylophoneIngredients = new HashMap<>();
+        xylophoneIngredients.put("B", "OAK_PLANKS");
+        xylophoneIngredients.put("C", "IRON_INGOT");
+        xylophonePattern = new ArrayList<>();
+        xylophonePattern.add("BBB");
+        xylophonePattern.add("CCC");
+        value(xylophoneItem,xylophoneIngredients,xylophonePattern,instName);
     }
 
     public void extravalue() {
-        extraItem = new ItemStack(Material.STICK);
-        ItemMeta meta = extraItem.getItemMeta();
+        String instName = "Extra";
+        extraItem = getItem(instName);
+        extraIngredients = new HashMap<>();
+        extraIngredients.put("A", "STRING");        
+        extraIngredients.put("B", "OAK_PLANKS");
+        extraIngredients.put("C", "IRON_INGOT");
+        extraPattern = new ArrayList<>();
+        extraPattern.add("CBC");
+        extraPattern.add("BAB");
+        extraPattern.add("ACA");
+        value(extraItem,extraIngredients,extraPattern,instName);
+    }
+
+    public void value(ItemStack item, Map<String,String> ingredients, List<String> pattern, String instName) {
+        List<String> lore = new ArrayList<String>();
+        ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            FileConfiguration extraConfig = InstrumentConfigManager.get("Extra");
-            String extraName = "&6Epic Extra";
-            if (extraConfig != null) {
-                extraName = extraConfig.getString("extra-name", extraName);
+            FileConfiguration config = InstrumentConfigManager.get(instName);
+            String name = "&6Epic " + instName;
+            if (config != null) {
+
+                String withUnderscores = instName.replaceAll("(?<!^)([A-Z])", "_$1");
+                String nameformated = config.getString(withUnderscores.toLowerCase() + "-name", name);
+                if(nameformated != name){
+                    name = nameformated;
+                }
+
+                try{
+                    ConfigurationSection ingredientsSettings = config.getConfigurationSection("recipe.ingredients");
+
+                        if(ingredientsSettings != null){
+                            for(String key : ingredientsSettings.getKeys(false)){
+                                ingredients.put(key, ingredientsSettings.getString(key));
+                            }
+                        }
+                } catch (IllegalStateException e) {
+                }
+
+                try{
+                    List<String> patternRecipe = config.getStringList("recipe.pattern");
+                    if(patternRecipe != null){
+                        for(int i = 0; i< patternRecipe.size(); i ++){
+                            if(i>2)break;
+                            pattern.set(i, patternRecipe.get(i));
+                        }
+                        if( patternRecipe.size() == 1){
+                           if(pattern.size()== 3){
+                               pattern.remove(2);
+                           }
+                           if(pattern.size()== 2){
+                               pattern.remove(1);
+                           }
+                        }
+                        if( patternRecipe.size() == 2){
+                           if(pattern.size()== 3){
+                            pattern.remove(2);
+                           }
+                        }
+                    }
+                } catch (IllegalStateException e) {
+                }
+
+                try{
+                    lore = config.getStringList("lore");
+                } catch (IllegalStateException e) {
+                }
+
             }
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', extraName));
-            extraItem.setItemMeta(meta);
+            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
+            if(lore !=null){
+                for(int i = 0; i< lore.size(); i ++){
+                    lore.set(i, ChatColor.translateAlternateColorCodes('&', lore.get(i)));
+                }
+            meta.setLore(lore);
+            }
+            
+            item.setItemMeta(meta);
         }
     }
 
+    public ItemStack getItem(String instName){
+        FileConfiguration config = InstrumentConfigManager.get(instName);
+        if (config != null) {
+            String itemOnConf = config.getString("item");
+            if(itemOnConf != null){
+                Material mat = checkMat(itemOnConf);
+                return new ItemStack(mat);
+            }
+        }
+        return new ItemStack(Material.STICK);
+    }
+
+    public void createRecipe(ItemStack item, Map<String,String> ingredients, List<String> pattern, String instName){
+        String racipeName = instName + "_recipe";
+        NamespacedKey key = new NamespacedKey(this, racipeName);
+        ShapedRecipe recipe = new ShapedRecipe(key, item);
+        List<String> patternA = new ArrayList<>();
+        for(int i = 0; i < pattern.size(); i ++){
+            String str = String.format("%-3s", pattern.get(i));
+            patternA.add(str.substring(0,3));
+        }
+        String patternString;
+        if(pattern.size() == 3){
+            recipe.shape(patternA.get(0), patternA.get(1), patternA.get(2)); 
+            patternString = patternA.get(0) + patternA.get(1) + patternA.get(2);
+        } else if(pattern.size() == 2){
+            recipe.shape(patternA.get(0), patternA.get(1));
+            patternString = patternA.get(0) + patternA.get(1);
+        } else {
+            recipe.shape(patternA.get(0));     
+            patternString = patternA.get(0);      
+        }
+
+        String[] str = patternString.replace(" ","").split("");
+
+        for(String ingKey: str){
+            if(ingredients.containsKey(ingKey)){
+                Material mat;
+                // compatible with old version
+                if(ingredients.get(ingKey) == "OAK_PLANKS"){
+                  mat = getWoodMaterial();
+                }else if(ingredients.get(ingKey) == "IRON_INGOT"){
+                  mat = getIronMaterial();
+                }else if(ingredients.get(ingKey) == "STRING"){
+                  mat = getStringMaterial();
+                }else{
+                  mat = Material.valueOf(ingredients.get(ingKey));
+                }
+                recipe.setIngredient(ingKey.toCharArray()[0], mat);
+            }else{
+                recipe.setIngredient(ingKey.toCharArray()[0], Material.valueOf("STICK"));                
+            }
+        }
+        addRecipeSafely(key, recipe, instName);
+    }
+
     private void addRecipeSafely(NamespacedKey key, ShapedRecipe recipe, String recipeName) {
-        removeSimilarRecipes(recipe.getResult());
+        removeShapedRecipeByKey(key);
+
         try {
             Bukkit.addRecipe(recipe);
         } catch (IllegalStateException e) {
         }
     }
-    
-    private void removeSimilarRecipes(ItemStack targetItem) {
-        try {
-            java.util.Iterator<org.bukkit.inventory.Recipe> iterator = Bukkit.recipeIterator();
-            while (iterator.hasNext()) {
-                org.bukkit.inventory.Recipe recipe = iterator.next();
-                if (recipe instanceof org.bukkit.inventory.ShapedRecipe) {
-                    org.bukkit.inventory.ShapedRecipe shapedRecipe = (org.bukkit.inventory.ShapedRecipe) recipe;
-                    if (shapedRecipe.getResult().isSimilar(targetItem)) {
-                        iterator.remove();
-                    }
+
+    private void removeShapedRecipeByKey(NamespacedKey targetKey) {
+        java.util.Iterator<Recipe> iterator = Bukkit.recipeIterator();
+
+        while (iterator.hasNext()) {
+            Recipe recipe = iterator.next();
+
+            if (recipe instanceof ShapedRecipe) {
+                ShapedRecipe shaped = (ShapedRecipe) recipe;
+                NamespacedKey key = shaped.getKey();
+
+                if (key != null && key.equals(targetKey)) {
+                    iterator.remove();
+                    break;
                 }
             }
-        } catch (Exception e) {
         }
     }
-    
+
+    private Material checkMat(String mat){
+        try {
+                return Material.valueOf(mat);
+            } catch (IllegalArgumentException e) {
+                return Material.valueOf("OAK_PLANKS");
+            }
+    }
+
     private Material getWoodMaterial() {
         try {
             return Material.valueOf("OAK_PLANKS");
@@ -643,164 +847,6 @@ public class NoteBlockMelody extends JavaPlugin {
         } catch (IllegalArgumentException e) {
             return Material.valueOf("SULPHUR");
         }
-    }
-
-    private void createBanjoRecipe() {
-        NamespacedKey key = new NamespacedKey(this, "banjo_recipe");
-        ShapedRecipe recipe = new ShapedRecipe(key, banjoItem);
-        recipe.shape(" W ", " SW", "W W");
-        recipe.setIngredient('W', getWoodMaterial());
-        recipe.setIngredient('S', getStringMaterial());
-        addRecipeSafely(key, recipe, "Banjo");
-    }
-
-    private void createBaseDrumRecipe() {
-        NamespacedKey key = new NamespacedKey(this, "basedrum_recipe");
-        ShapedRecipe recipe = new ShapedRecipe(key, baseDrumItem);
-        recipe.shape("LIL", "LWL", "LIL");
-        recipe.setIngredient('W', getWoodMaterial());
-        recipe.setIngredient('I', getIronMaterial());
-        recipe.setIngredient('L', Material.STRING);
-        addRecipeSafely(key, recipe, "BaseDrum");
-    }
-
-    private void createBassRecipe() {
-        NamespacedKey key = new NamespacedKey(this, "bass_recipe");
-        ShapedRecipe recipe = new ShapedRecipe(key, bassItem);
-        recipe.shape("IS ", "WS ", "W  ");
-        recipe.setIngredient('W', getWoodMaterial());
-        recipe.setIngredient('S', getStringMaterial());
-        recipe.setIngredient('I', getIronMaterial());
-        addRecipeSafely(key, recipe, "Bass");
-    }
-
-    private void createBellRecipe() {
-        NamespacedKey key = new NamespacedKey(this, "bell_recipe");
-        ShapedRecipe recipe = new ShapedRecipe(key, bellItem);
-        recipe.shape(" W ", " W ", "ISI");
-        recipe.setIngredient('W', Material.STICK);
-        recipe.setIngredient('S', getStringMaterial());
-        recipe.setIngredient('I', getIronMaterial());
-        addRecipeSafely(key, recipe, "Bell");
-    }
-
-    private void createBitRecipe() {
-        NamespacedKey key = new NamespacedKey(this, "bit_recipe");
-        ShapedRecipe recipe = new ShapedRecipe(key, guitarItem);
-        recipe.shape("III", "   ", "IWI");
-        recipe.setIngredient('W', getWoodMaterial());
-        recipe.setIngredient('I', getStringMaterial());
-        addRecipeSafely(key, recipe, "Bit");
-    }
-
-    private void createChimeRecipe() {
-        NamespacedKey key = new NamespacedKey(this, "chime_recipe");
-        ShapedRecipe recipe = new ShapedRecipe(key, chimeItem);
-        recipe.shape("WWW", "III", " II");
-        recipe.setIngredient('W', getWoodMaterial());
-        recipe.setIngredient('I', getIronMaterial());
-        addRecipeSafely(key, recipe, "Chime");
-    }
-
-    private void createCowBellRecipe() {
-        NamespacedKey key = new NamespacedKey(this, "cow_bell_recipe");
-        ShapedRecipe recipe = new ShapedRecipe(key, bellItem);
-        recipe.shape(" W ", "IWI", "ISI");
-        recipe.setIngredient('W', Material.STICK);
-        recipe.setIngredient('S', getStringMaterial());
-        recipe.setIngredient('I', getIronMaterial());
-        addRecipeSafely(key, recipe, "CowBell");
-    }
-
-    private void createDidgeridooRecipe() {
-        NamespacedKey key = new NamespacedKey(this, "didgeridoo_recipe");
-        ShapedRecipe recipe = new ShapedRecipe(key, didgeridooItem);
-        recipe.shape("WIW", "W W", "WIW");
-        recipe.setIngredient('W', Material.STICK);
-        recipe.setIngredient('I', getIronMaterial());
-        addRecipeSafely(key, recipe, "Didgeridoo");
-    }
-
-    private void createFluteRecipe() {
-        NamespacedKey key = new NamespacedKey(this, "flute_recipe");
-        ShapedRecipe recipe = new ShapedRecipe(key, fluteItem);
-        recipe.shape("WWW", "   ", "   ");
-        recipe.setIngredient('W', Material.STICK);
-        addRecipeSafely(key, recipe, "Flute");
-    }
-
-    private void createGuitarRecipe() {
-        NamespacedKey key = new NamespacedKey(this, "guitar_recipe");
-        ShapedRecipe recipe = new ShapedRecipe(key, guitarItem);
-        recipe.shape("W  ", " SW", " WW");
-        recipe.setIngredient('W', getWoodMaterial());
-        recipe.setIngredient('S', getStringMaterial());
-        addRecipeSafely(key, recipe, "Guitar");
-    }
-
-    private void createHarpRecipe() {
-        NamespacedKey key = new NamespacedKey(this, "harp_recipe");
-        ShapedRecipe recipe = new ShapedRecipe(key, harpItem);
-        recipe.shape(" SW", " SW", "SWW");
-        recipe.setIngredient('W', getWoodMaterial());
-        recipe.setIngredient('S', getStringMaterial());
-        addRecipeSafely(key, recipe, "Harp");
-    }
-
-    private void createHatRecipe() {
-        NamespacedKey key = new NamespacedKey(this, "hat_recipe");
-        ShapedRecipe recipe = new ShapedRecipe(key, hatItem);
-        recipe.shape("III", " W ", " W ");
-        recipe.setIngredient('W', Material.STICK);
-        recipe.setIngredient('I', getIronMaterial());
-        addRecipeSafely(key, recipe, "Hat");
-    }
-
-    private void createIronXylophoneRecipe() {
-        NamespacedKey key = new NamespacedKey(this, "iron_xylophone_recipe");
-        ShapedRecipe recipe = new ShapedRecipe(key, ironXylophoneItem);
-        recipe.shape("   ", "WWW", "III");
-        recipe.setIngredient('W', getWoodMaterial());
-        recipe.setIngredient('I', getIronMaterial());
-        addRecipeSafely(key, recipe, "IronXylophone");
-    }
-
-    private void createPlingRecipe() {
-        NamespacedKey key = new NamespacedKey(this, "pling_recipe");
-        ShapedRecipe recipe = new ShapedRecipe(key, plingItem);
-        recipe.shape("III", "   ", "WIW");
-        recipe.setIngredient('W', getWoodMaterial());
-        recipe.setIngredient('I', getIronMaterial());
-        addRecipeSafely(key, recipe, "Pling");
-    }
-
-    private void createSnareDrumRecipe() {
-        NamespacedKey key = new NamespacedKey(this, "snaredrum_recipe");
-        ShapedRecipe recipe = new ShapedRecipe(key, snareDrumItem);
-        recipe.shape("LLL", "IWI", "LLL");
-        recipe.setIngredient('W', getWoodMaterial());
-        recipe.setIngredient('I', getIronMaterial());
-        recipe.setIngredient('L', Material.STRING);
-        addRecipeSafely(key, recipe, "SnareDrum");
-    }
-
-    private void createXylophoneRecipe() {
-        NamespacedKey key = new NamespacedKey(this, "xylophone_recipe");
-        ShapedRecipe recipe = new ShapedRecipe(key, xylophoneItem);
-        recipe.shape("   ", "III", "WWW");
-        recipe.setIngredient('W', getWoodMaterial());
-        recipe.setIngredient('I', getIronMaterial());
-        addRecipeSafely(key, recipe, "Xylophone");
-    }
-
-    private void createExtraRecipe() {
-        NamespacedKey key = new NamespacedKey(this, "extra_recipe");
-        ShapedRecipe recipe = new ShapedRecipe(key, guitarItem);
-        recipe.shape("IWI", "WSW", "SIS");
-        recipe.setIngredient('W', getWoodMaterial());
-        recipe.setIngredient('S', getStringMaterial());
-        recipe.setIngredient('I', getIronMaterial());
-        addRecipeSafely(key, recipe, "Extra");
     }
 
 }

@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class InstrumentConfigManager {
+    private static String version = "1.0";
 
     private static final String[] instrumentFiles = {
             "Banjo", "BaseDrum", "Bass", "Bell", "Bit", 
@@ -26,11 +27,11 @@ public class InstrumentConfigManager {
         }
 
         for (String name : instrumentFiles) {
-            File file = new File(folder, name + ".yml");
+            File file = new File(folder, "instruments" + File.separator + name + ".yml");
 
             if (!file.exists()) {
                 try {
-                    plugin.saveResource(name + ".yml", false);
+                    plugin.saveResource("instruments/" + name + ".yml", false);
                     plugin.getLogger().info("[NBM] Created default file: " + name + ".yml");
                 } catch (Exception e) {
                     plugin.getLogger().warning("[NBM] Failed to create default file: " + name + ".yml - " + e.getMessage());
@@ -46,6 +47,7 @@ public class InstrumentConfigManager {
                            }
            }
 
+           // what is this? for compatibility with old version?
            File lowercaseGuitar = new File(folder, "guitar.yml");
         if (lowercaseGuitar.exists()) {
             try {
@@ -54,6 +56,17 @@ public class InstrumentConfigManager {
                 plugin.getLogger().warning("[NBM] Failed to load guitar.yml - " + e.getMessage());
             }
         }
+
+        String lang = plugin.getConfig().getString("lang");
+        File langFile = new File(folder, "languages" + File.separator + lang + ".yml");
+        if (!langFile.exists()) {
+            plugin.saveResource("languages/" + plugin.getConfig().getString("lang") + ".yml", false);
+        }
+        String confVerion =  plugin.getConfig().getString("translation_version");
+        if (confVerion != version){
+            plugin.saveResource("languages/en.yml", true);
+        }
+
     }
 
     public static FileConfiguration get(String name) {

@@ -1,5 +1,37 @@
 gui-title: "Banjo GUI"
 banjo-name: "&6Epic Banjo"
+
+# ----------------------
+# If you want to change the recipe, remove the comment out of the following section.
+# ingredients must be Materials that match the server version.
+# Ref. https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+# recipe:
+#   ingredients:
+#     A: STICK
+#     B: STRING
+#     C: OAK_PLANKS
+#   pattern:
+#     - "A  "
+#     - " BC"
+#     - " CC"
+# ----------------------
+
+# ----------------------
+# If you want to change the item, remove the comment out of the following section.
+# Item must be Materials that match the server version.
+# Ref. https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+#
+# item: STONE
+# ----------------------
+
+# ----------------------
+# If you want to add lore to the item, remove the comment out of the following section.
+#
+# lore:
+#   - "&6This is a Epic Banjo"
+#   - "&6Interact and open Banjo GUI"
+# ----------------------
+
 strings:
   - "STICK"
   - "STICK"
