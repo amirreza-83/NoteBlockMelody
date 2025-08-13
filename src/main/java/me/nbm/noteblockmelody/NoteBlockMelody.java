@@ -1,7 +1,6 @@
 package me.nbm.noteblockmelody;
 
 import me.nbm.noteblockmelody.config.InstrumentConfigManager;
-import me.nbm.noteblockmelody.NBMCommand;
 import me.nbm.noteblockmelody.notes.banjo.banjo_command;
 import me.nbm.noteblockmelody.notes.banjo.banjo_event;
 import me.nbm.noteblockmelody.notes.base_drum.base_drum_command;
@@ -41,13 +40,10 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.material.MaterialData;
 import org.bukkit.inventory.ShapedRecipe;
-import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
