@@ -142,8 +142,11 @@ public class NoteBlockMelody extends JavaPlugin {
 
     public ConsoleCommandSender message;
 
+    public String versionNumber;
+
     @Override
     public void onEnable() {
+
         saveDefaultConfig();
         config = getConfig();
         message = Bukkit.getConsoleSender();
@@ -383,7 +386,7 @@ public class NoteBlockMelody extends JavaPlugin {
         message.sendMessage("§e §aServer: §f" + String.format("%-32s", version));
         message.sendMessage("§e §aBukkit: §f" + String.format("%-32s", bukkitVersion));
         
-        String versionNumber = extractVersionNumber(bukkitVersion);
+        versionNumber = extractVersionNumber(bukkitVersion);
         message.sendMessage("§e §aVersion: §f" + String.format("%-31s", versionNumber));
         message.sendMessage("§e╠═════════════════════════════════════════════╣");
         
@@ -407,11 +410,17 @@ public class NoteBlockMelody extends JavaPlugin {
         }
         return bukkitVersion;
     }
-    
+
     private boolean isVersion1_12_or_below(String version) {
         return version.startsWith("1.12") || version.startsWith("1.11") || 
                version.startsWith("1.10") || version.startsWith("1.9") || 
                version.startsWith("1.8") || version.startsWith("1.7");
+    }
+
+    private boolean isVersionAtLeast(String current, String target) {
+        int currentMajor = Integer.parseInt(current.split("\\.")[1]);
+        int targetMajor = Integer.parseInt(target.split("\\.")[1]);
+        return currentMajor >= targetMajor;
     }
 
     public void langLoad(){
@@ -423,7 +432,6 @@ public class NoteBlockMelody extends JavaPlugin {
         }
         defDictionaly = YamlConfiguration.loadConfiguration(defLangFile);
         dictionaly = YamlConfiguration.loadConfiguration(langFile);
-
     }
 
     public String translate(String key){
@@ -661,6 +669,7 @@ public class NoteBlockMelody extends JavaPlugin {
 
     public void value(ItemStack item, Map<String,String> ingredients, List<String> pattern, String instName) {
         List<String> lore = new ArrayList<String>();
+        Integer customModelData = -1;
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             FileConfiguration config = InstrumentConfigManager.get(instName);
@@ -712,6 +721,10 @@ public class NoteBlockMelody extends JavaPlugin {
                     lore = config.getStringList("lore");
                 } catch (IllegalStateException e) {
                 }
+                try{
+                    customModelData = config.getInt("custom_model_data");
+                } catch (IllegalStateException e) {
+                }
 
             }
             meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
@@ -721,7 +734,10 @@ public class NoteBlockMelody extends JavaPlugin {
                 }
             meta.setLore(lore);
             }
-            
+
+            if (isVersionAtLeast(versionNumber, "1.16") && customModelData >= 0) {
+                meta.setCustomModelData(customModelData);
+            }   
             item.setItemMeta(meta);
         }
     }

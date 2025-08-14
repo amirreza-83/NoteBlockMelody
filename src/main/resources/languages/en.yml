@@ -40,3 +40,4 @@ faild-to-reload-a-part-of-configs: "Some configs were reloaded successfully, but
 no-reloaded-configs: "No config files could be reloaded!"
 reloaded-recipes: "Successfully reloaded recipes!"
 faild-to-reload-recipes: "Failed to reload recipes!"
+dont-have-permission-to-use-instruments: "you don't have permission to use instruments"

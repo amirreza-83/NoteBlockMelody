@@ -18,7 +18,7 @@ public class hat_command implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "This command can only be used by players!");
+            sender.sendMessage(ChatColor.RED + plugin.translate("this-command-player-only"));
             return true;
         }
 
@@ -28,7 +28,7 @@ public class hat_command implements CommandExecutor {
             hat_event event = new hat_event(plugin);
             event.openHatGUI(player);
         } else {
-            player.sendMessage(ChatColor.RED + "You don't have permission to use instruments.");
+            player.sendMessage(ChatColor.RED + plugin.translate("dont-have-permission-to-use-instruments"));
         }
 
         return true;

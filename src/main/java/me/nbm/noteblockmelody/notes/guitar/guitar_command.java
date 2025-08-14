@@ -18,7 +18,7 @@ public class guitar_command implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "This command can only be run by a player.");
+            sender.sendMessage(ChatColor.RED + plugin.translate("this-command-player-only"));
             return true;
         }
 
@@ -27,7 +27,7 @@ public class guitar_command implements CommandExecutor {
         if (player.hasPermission("nbm.use")) {
             new guitar_event(plugin).openGuitarGUI(player);
         } else {
-            player.sendMessage(ChatColor.RED + "You don't have permission to use instruments.");
+            player.sendMessage(ChatColor.RED + plugin.translate("dont-have-permission-to-use-instruments"));
         }
 
         return true;

@@ -14,7 +14,6 @@ banjo-name: "&6Epic Banjo"
 #     - "A  "
 #     - " BC"
 #     - " CC"
-# ----------------------
 
 # ----------------------
 # If you want to change the item, remove the comment out of the following section.
@@ -22,7 +21,12 @@ banjo-name: "&6Epic Banjo"
 # Ref. https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
 #
 # item: STONE
+
 # ----------------------
+# If you want to use custom mode data, remove the comment out of the following section.
+# The custom_model_data function is only 1.16+.
+#
+# custom_model_data: 10099
 
 # ----------------------
 # If you want to add lore to the item, remove the comment out of the following section.
@@ -30,7 +34,22 @@ banjo-name: "&6Epic Banjo"
 # lore:
 #   - "&6This is a Epic Banjo"
 #   - "&6Interact and open Banjo GUI"
-# ----------------------
+
+# ---------------------
+# You can use following format for registering strings.
+# When you use this format, the string-names section below is ignored, and lore and custom_model_data can be set.
+# The custom_model_data function is only 1.16+.
+#
+# strings:
+#   1:
+#     material: STICK
+#     display-name: "&lF#3"
+#     custom_model_data: 10010
+#     lore:
+#       - ""
+#       - ""
+#     sound: BLOCK_NOTE_BLOCK_BANJO
+#     pitch: 0.5
 
 strings:
   - "STICK"
